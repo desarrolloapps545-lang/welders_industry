@@ -10,6 +10,7 @@ const loginScreen = document.getElementById('login-screen');
 const loginContainer = document.getElementById('login-container');
 const dashboardScreen = document.getElementById('dashboard-screen');
 const loginForm = document.getElementById('login-form');
+const loadingScreen = document.getElementById('loading-screen');
 const emailInput = document.getElementById('email');
 const passwordInput = document.getElementById('password');
 const errorMsg = document.getElementById('error-msg');
@@ -1809,39 +1810,53 @@ btnSaveStockPermissions.addEventListener('click', async () => {
 
 // --- Persistencia de Sesión (Recargar página sin perder login) ---
 document.addEventListener('DOMContentLoaded', async () => {
-    // Verificar si existe una sesión activa en Supabase
-    const { data: { session } } = await supabaseClient.auth.getSession();
-    
-    if (session) {
-        const userId = session.user.id;
+    try {
+        // Verificar si existe una sesión activa en Supabase
+        const { data: { session } } = await supabaseClient.auth.getSession();
         
-        // Recuperar rol del usuario desde la base de datos
-        const { data: userData, error } = await supabaseClient
-            .from('users')
-            .select('role')
-            .eq('id', userId)
-            .single();
-        
-        if (userData) {
-            currentUserRole = userData.role;
+        if (session) {
+            const userId = session.user.id;
+            
+            // Recuperar rol del usuario desde la base de datos
+            const { data: userData, error } = await supabaseClient
+                .from('users')
+                .select('role')
+                .eq('id', userId)
+                .single();
+            
+            if (userData) {
+                currentUserRole = userData.role;
 
-            // Configurar menú lateral según rol (Misma lógica que en login)
-            const menuUsers = document.getElementById('btn-users');
-            const menuProducts = document.getElementById('btn-products');
-            const menuInventory = document.getElementById('btn-inventory');
+                // Configurar menú lateral según rol (Misma lógica que en login)
+                const menuUsers = document.getElementById('btn-users');
+                const menuProducts = document.getElementById('btn-products');
+                const menuInventory = document.getElementById('btn-inventory');
 
-            if (currentUserRole === 'Operario') {
-                menuUsers.classList.add('hidden');
-                menuProducts.classList.add('hidden');
-                menuInventory.classList.add('hidden');
+                if (currentUserRole === 'Operario') {
+                    menuUsers.classList.add('hidden');
+                    menuProducts.classList.add('hidden');
+                    menuInventory.classList.add('hidden');
+                } else {
+                    menuUsers.classList.remove('hidden');
+                    menuProducts.classList.remove('hidden');
+                    menuInventory.classList.remove('hidden');
+                }
+
+                // Restaurar pantalla principal
+                cambiarPantalla(false);
             } else {
-                menuUsers.classList.remove('hidden');
-                menuProducts.classList.remove('hidden');
-                menuInventory.classList.remove('hidden');
+                // Sesión existe pero no hay datos de usuario, mostrar login
+                loginContainer.classList.remove('hidden');
             }
-
-            // Restaurar pantalla principal
-            cambiarPantalla(false);
+        } else {
+            // No hay sesión, mostrar login
+            loginContainer.classList.remove('hidden');
         }
+    } catch (error) {
+        console.error("Error al inicializar:", error);
+        loginContainer.classList.remove('hidden');
+    } finally {
+        // Ocultar pantalla de carga
+        loadingScreen.classList.add('hidden');
     }
 });
