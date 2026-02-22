@@ -101,7 +101,7 @@ button:hover {
 
 .sidebar {
     width: 250px;
-    background: linear-gradient(to bottom, #434343 0%, #ffffff 100%);
+    background: linear-gradient(to bottom, #434343 0%, #a9a9a9 100%);
     color: white;
     flex-direction: column;
     padding: 20px;
@@ -126,17 +126,17 @@ button:hover {
 }
 
 .nav-btn {
-    background: linear-gradient(to bottom, #d32f2f, #8b0000);
+    background: linear-gradient(135deg, #000000 0%, #434343 100%);
     color: white;
     text-align: center;
     padding: 12px;
     margin: 0;
-    border: 2px solid #8b0000;
+    border: 2px solid #000000;
     border-radius: 8px;
 }
 
 .nav-btn:hover {
-    background: linear-gradient(to bottom, #e53935, #b71c1c);
+    opacity: 0.9;
 }
 
 .nav-btn.refresh-btn {
