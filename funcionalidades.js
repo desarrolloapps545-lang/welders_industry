@@ -413,9 +413,9 @@ async function cargarUsuarios() {
         let accionesHtml = '';
         if (myLevel > targetLevel) {
             accionesHtml = `
-                <button class="action-btn" style="background-color:#ffc107" onclick="prepararEdicion('${user.id}')">✏️</button>
-                <button class="action-btn" style="background-color:#17a2b8" onclick="abrirModalPassword('${user.id}')">🔒</button>
-                <button class="action-btn" style="background-color:#dc3545" onclick="eliminarUsuario('${user.id}')">🗑️</button>
+                <button class="action-btn" style="background-color:#ffc107" title="Editar" onclick="prepararEdicion('${user.id}')"><i class="fa-solid fa-pen"></i></button>
+                <button class="action-btn" style="background-color:#17a2b8" title="Contraseña" onclick="abrirModalPassword('${user.id}')"><i class="fa-solid fa-key"></i></button>
+                <button class="action-btn" style="background-color:#dc3545" title="Eliminar" onclick="eliminarUsuario('${user.id}')"><i class="fa-solid fa-trash"></i></button>
             `;
         }
         const row = document.createElement('tr');
@@ -675,8 +675,8 @@ async function cargarProductos() {
             <td>${prod.registration_date}</td>
             <td>${prod.measurement_unit}</td>
             <td>
-                <button class="action-btn" style="background-color:#ffc107" title="Editar" onclick="prepararEdicionProducto('${prod.id}')">✏️</button>
-                <button class="action-btn" style="background-color:#dc3545" title="Eliminar" onclick="eliminarProducto('${prod.id}')">🗑️</button>
+                <button class="action-btn" style="background-color:#ffc107" title="Editar" onclick="prepararEdicionProducto('${prod.id}')"><i class="fa-solid fa-pen"></i></button>
+                <button class="action-btn" style="background-color:#dc3545" title="Eliminar" onclick="eliminarProducto('${prod.id}')"><i class="fa-solid fa-trash"></i></button>
             </td>
         `;
         productsTableBody.appendChild(row);
@@ -817,8 +817,8 @@ async function cargarInventario() {
             <td>${formattedAmount}</td>
             <td>${unit}</td>
             <td>
-                <button class="action-btn" style="background-color:#ffc107" title="Editar" onclick="prepararEdicionInventario('${item.id}')">✏️</button>
-                <button class="action-btn" style="background-color:#dc3545" title="Eliminar" onclick="eliminarInventario('${item.id}')">🗑️</button>
+                <button class="action-btn" style="background-color:#ffc107" title="Editar" onclick="prepararEdicionInventario('${item.id}')"><i class="fa-solid fa-pen"></i></button>
+                <button class="action-btn" style="background-color:#dc3545" title="Eliminar" onclick="eliminarInventario('${item.id}')"><i class="fa-solid fa-trash"></i></button>
             </td>
         `;
         inventoryTableBody.appendChild(row);
@@ -884,7 +884,7 @@ function crearFilaInventario(esAdicional = false) {
     if (esAdicional) {
         const btnDel = document.createElement('button');
         btnDel.type = 'button';
-        btnDel.textContent = 'X';
+        btnDel.innerHTML = '<i class="fa-solid fa-xmark"></i>';
         btnDel.className = 'btn-remove-row';
         btnDel.onclick = () => rowDiv.remove();
         rowDiv.appendChild(btnDel);
@@ -1312,12 +1312,12 @@ async function cargarRegistrosHoy() {
                 : '<span style="background:#f8d7da; color:#721c24; padding:4px 8px; border-radius:4px; font-weight:bold;">Salida</span>';
 
             const btnPlate = rec.plate_url
-                ? `<button onclick="abrirModalImagen('${rec.plate_url}')" style="display:inline-block; background:#17a2b8; color:white; padding:5px 10px; border:none; text-decoration:none; border-radius:4px; cursor:pointer;">Ver</button>`
+                ? `<button onclick="abrirModalImagen('${rec.plate_url}')" style="display:inline-block; background:#17a2b8; color:white; padding:5px 10px; border:none; text-decoration:none; border-radius:4px; cursor:pointer;"><i class="fa-solid fa-eye"></i> Ver</button>`
                 : '<span style="color:#ccc;">-</span>';
                 
             const btnInvoice = rec.invoice_url
-                ? `<button onclick="abrirModalImagen('${rec.invoice_url}')" style="display:inline-block; background:#17a2b8; color:white; padding:5px 10px; border:none; text-decoration:none; border-radius:4px; cursor:pointer;">Ver</button>`
-                : '<button disabled style="background:#e9ecef; color:#adb5bd; border:none; padding:5px 10px; border-radius:4px; cursor:not-allowed;">Ver</button>';
+                ? `<button onclick="abrirModalImagen('${rec.invoice_url}')" style="display:inline-block; background:#17a2b8; color:white; padding:5px 10px; border:none; text-decoration:none; border-radius:4px; cursor:pointer;"><i class="fa-solid fa-eye"></i> Ver</button>`
+                : '<button disabled style="background:#e9ecef; color:#adb5bd; border:none; padding:5px 10px; border-radius:4px; cursor:not-allowed;"><i class="fa-solid fa-eye-slash"></i> Ver</button>';
 
             const userCell = `<td style="padding:12px;">${rec.user_name || 'N/A'}</td>`;
             
@@ -1326,8 +1326,8 @@ async function cargarRegistrosHoy() {
                 // Pasamos el objeto rec completo serializado o usamos un ID para buscarlo en cache si fuera necesario.
                 // Aquí usaremos funciones globales pasando los datos clave.
                 accionesCell = `<td style="padding:12px;">
-                    <button onclick='prepararEdicionRegistro(${JSON.stringify(rec).replace(/'/g, "&#39;")})' style="background:#ffc107; border:none; padding:5px 8px; border-radius:4px; cursor:pointer; margin-right:5px;">✏️</button>
-                    <button onclick="eliminarRegistro('${rec.id}', '${rec.table}', '${rec.plate_url || ''}', '${rec.invoice_url || ''}')" style="background:#dc3545; border:none; padding:5px 8px; border-radius:4px; cursor:pointer; color:white;">🗑️</button>
+                    <button onclick='prepararEdicionRegistro(${JSON.stringify(rec).replace(/'/g, "&#39;")})' style="background:#ffc107; border:none; padding:5px 8px; border-radius:4px; cursor:pointer; margin-right:5px;" title="Editar"><i class="fa-solid fa-pen"></i></button>
+                    <button onclick="eliminarRegistro('${rec.id}', '${rec.table}', '${rec.plate_url || ''}', '${rec.invoice_url || ''}')" style="background:#dc3545; border:none; padding:5px 8px; border-radius:4px; cursor:pointer; color:white;" title="Eliminar"><i class="fa-solid fa-trash"></i></button>
                 </td>`;
             }
 
@@ -1454,16 +1454,16 @@ async function cargarHistorial() {
                 ? '<span style="background:#d4edda; color:#155724; padding:4px 8px; border-radius:4px; font-weight:bold;">Entrada</span>' 
                 : '<span style="background:#f8d7da; color:#721c24; padding:4px 8px; border-radius:4px; font-weight:bold;">Salida</span>';
 
-            const btnPlate = rec.plate_url ? `<button onclick="abrirModalImagen('${rec.plate_url}')" style="display:inline-block; background:#17a2b8; color:white; padding:5px 10px; border:none; border-radius:4px; cursor:pointer;">Ver</button>` : '<span style="color:#ccc;">-</span>';
-            const btnInvoice = rec.invoice_url ? `<button onclick="abrirModalImagen('${rec.invoice_url}')" style="display:inline-block; background:#17a2b8; color:white; padding:5px 10px; border:none; border-radius:4px; cursor:pointer;">Ver</button>` : '<button disabled style="background:#e9ecef; color:#adb5bd; border:none; padding:5px 10px; border-radius:4px; cursor:not-allowed;">Ver</button>';
+            const btnPlate = rec.plate_url ? `<button onclick="abrirModalImagen('${rec.plate_url}')" style="display:inline-block; background:#17a2b8; color:white; padding:5px 10px; border:none; border-radius:4px; cursor:pointer;"><i class="fa-solid fa-eye"></i> Ver</button>` : '<span style="color:#ccc;">-</span>';
+            const btnInvoice = rec.invoice_url ? `<button onclick="abrirModalImagen('${rec.invoice_url}')" style="display:inline-block; background:#17a2b8; color:white; padding:5px 10px; border:none; border-radius:4px; cursor:pointer;"><i class="fa-solid fa-eye"></i> Ver</button>` : '<button disabled style="background:#e9ecef; color:#adb5bd; border:none; padding:5px 10px; border-radius:4px; cursor:not-allowed;"><i class="fa-solid fa-eye-slash"></i> Ver</button>';
 
             const userCell = `<td style="padding:12px;">${rec.user_name || 'N/A'}</td>`;
             
             let accionesCell = '';
             if (isAdminOrDev) {
                 accionesCell = `<td style="padding:12px;">
-                    <button onclick='prepararEdicionRegistro(${JSON.stringify(rec).replace(/'/g, "&#39;")})' style="background:#ffc107; border:none; padding:5px 8px; border-radius:4px; cursor:pointer; margin-right:5px;">✏️</button>
-                    <button onclick="eliminarRegistro('${rec.id}', '${rec.table}', '${rec.plate_url || ''}', '${rec.invoice_url || ''}')" style="background:#dc3545; border:none; padding:5px 8px; border-radius:4px; cursor:pointer; color:white;">🗑️</button>
+                    <button onclick='prepararEdicionRegistro(${JSON.stringify(rec).replace(/'/g, "&#39;")})' style="background:#ffc107; border:none; padding:5px 8px; border-radius:4px; cursor:pointer; margin-right:5px;" title="Editar"><i class="fa-solid fa-pen"></i></button>
+                    <button onclick="eliminarRegistro('${rec.id}', '${rec.table}', '${rec.plate_url || ''}', '${rec.invoice_url || ''}')" style="background:#dc3545; border:none; padding:5px 8px; border-radius:4px; cursor:pointer; color:white;" title="Eliminar"><i class="fa-solid fa-trash"></i></button>
                 </td>`;
             }
 
