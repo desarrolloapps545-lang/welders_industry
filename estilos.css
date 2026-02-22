@@ -167,7 +167,7 @@ button:hover {
     display: flex;
     gap: 10px;
     margin-bottom: 20px;
-    justify-content: center;
+    justify-content: flex-start;
     flex-wrap: wrap;
 }
 
@@ -176,7 +176,13 @@ button:hover {
     padding: 8px 15px;
     font-size: 0.9rem;
     margin-top: 0;
-    background-color: #28a745;
+    background: linear-gradient(135deg, #000000 0%, #434343 100%);
+    color: white;
+    border: none;
+}
+
+.control-btn:hover {
+    opacity: 0.9;
 }
 
 .table-container {

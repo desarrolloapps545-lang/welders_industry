@@ -29,6 +29,10 @@
             <form id="login-form">
                 <input type="email" id="email" placeholder="Correo electrónico" required>
                 <input type="password" id="password" placeholder="Contraseña" required>
+                <div style="display: flex; align-items: center; justify-content: flex-start; margin: 10px 0;">
+                    <input type="checkbox" id="remember-me" style="width: auto; margin-right: 8px;">
+                    <label for="remember-me" style="color: #666; cursor: pointer;">Recordar datos</label>
+                </div>
                 <button type="submit" id="login-btn">Ingresar</button>
             </form>
             <p id="error-msg" class="error hidden"></p>
