@@ -11,6 +11,8 @@
     <!-- Importar ExcelJS y FileSaver para exportación limpia -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/exceljs/4.3.0/exceljs.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
+    <!-- Importar Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 <body>
 
@@ -29,7 +31,11 @@
             <form id="login-form">
                 <input type="email" id="email" placeholder="Correo electrónico" required>
                 <input type="password" id="password" placeholder="Contraseña" required>
-                <button type="submit" id="login-btn">Ingresar</button>
+                <div style="display: flex; align-items: center; justify-content: flex-start; margin: 10px 0;">
+                    <input type="checkbox" id="remember-me" style="width: auto; margin-right: 8px;">
+                    <label for="remember-me" style="color: #666; cursor: pointer;">Recordar datos</label>
+                </div>
+                <button type="submit" id="login-btn"><i class="fa-solid fa-right-to-bracket"></i> Ingresar</button>
             </form>
             <p id="error-msg" class="error hidden"></p>
         </div>
@@ -40,13 +46,13 @@
         <aside class="sidebar">
             <img src="img/logos/login.png" alt="Welders Industry" class="sidebar-logo">
             <nav class="sidebar-nav">
-                <button id="btn-users" class="nav-btn">Gestion de usuarios</button>
-                <button id="btn-products" class="nav-btn">Productos</button>
-                <button id="btn-inventory" class="nav-btn">Inventario</button>
-                <button id="btn-registry" class="nav-btn">Registro</button>
-                <button id="btn-history" class="nav-btn">Historial</button>
-                <button id="btn-refresh" class="nav-btn refresh-btn">Actualizar Datos</button>
-                <button id="logout-btn" class="nav-btn logout">Cerrar Sesión</button>
+                <button id="btn-users" class="nav-btn"><i class="fa-solid fa-users"></i> Gestion de usuarios</button>
+                <button id="btn-products" class="nav-btn"><i class="fa-solid fa-boxes-stacked"></i> Productos</button>
+                <button id="btn-inventory" class="nav-btn"><i class="fa-solid fa-warehouse"></i> Inventario</button>
+                <button id="btn-registry" class="nav-btn"><i class="fa-solid fa-pen-to-square"></i> Registro</button>
+                <button id="btn-history" class="nav-btn"><i class="fa-solid fa-clock-rotate-left"></i> Historial</button>
+                <button id="btn-refresh" class="nav-btn refresh-btn"><i class="fa-solid fa-rotate"></i> Actualizar Datos</button>
+                <button id="logout-btn" class="nav-btn logout"><i class="fa-solid fa-right-from-bracket"></i> Cerrar Sesión</button>
             </nav>
         </aside>
 
@@ -57,9 +63,9 @@
                 
                 <!-- Botones de control -->
                 <div class="user-controls">
-                    <button id="btn-new-user" class="control-btn">Nuevo usuario</button>
-                    <button id="btn-change-pass" class="control-btn">Cambiar contraseña</button>
-                    <button id="btn-update-data" class="control-btn">Actualizacion de datos</button>
+                    <button id="btn-new-user" class="control-btn"><i class="fa-solid fa-user-plus"></i> Nuevo usuario</button>
+                    <button id="btn-change-pass" class="control-btn"><i class="fa-solid fa-key"></i> Cambiar contraseña</button>
+                    <button id="btn-update-data" class="control-btn"><i class="fa-solid fa-id-card"></i> Actualizacion de datos</button>
                 </div>
 
                 <!-- Tabla de usuarios -->
@@ -84,7 +90,7 @@
                 
                 <!-- Botones de control -->
                 <div class="user-controls">
-                    <button id="btn-new-product" class="control-btn">Añadir nuevo producto</button>
+                    <button id="btn-new-product" class="control-btn"><i class="fa-solid fa-plus"></i> Añadir nuevo producto</button>
                 </div>
 
                 <!-- Tabla de productos -->
@@ -107,7 +113,7 @@
 
                 <!-- Botones de control -->
                 <div class="user-controls">
-                    <button id="btn-add-inventory" class="control-btn">Ingresar inventario</button>
+                    <button id="btn-add-inventory" class="control-btn"><i class="fa-solid fa-dolly"></i> Ingresar inventario</button>
                 </div>
 
                 <!-- Tabla de inventario -->
@@ -130,8 +136,8 @@
                 <h2>Registro</h2>
                 <div class="registry-container">
                     <div class="registry-type-selector">
-                        <button type="button" class="type-btn" id="btn-type-entry">Entrada</button>
-                        <button type="button" class="type-btn" id="btn-type-exit">Salida</button>
+                        <button type="button" class="type-btn" id="btn-type-entry"><i class="fa-solid fa-arrow-right-to-bracket"></i> Entrada</button>
+                        <button type="button" class="type-btn" id="btn-type-exit"><i class="fa-solid fa-arrow-right-from-bracket"></i> Salida</button>
                     </div>
 
                     <form id="form-registry" class="hidden">
@@ -155,7 +161,7 @@
                         <label>Foto de factura (Opcional):</label>
                         <input type="file" id="reg-photo-invoice" accept="image/*" capture="environment">
 
-                        <button type="submit" id="btn-submit-registry" style="margin-top: 20px;">Registrar</button>
+                        <button type="submit" id="btn-submit-registry" style="margin-top: 20px;"><i class="fa-solid fa-floppy-disk"></i> Registrar</button>
                     </form>
                     <p id="registry-msg" class="error"></p>
                 </div>
@@ -165,15 +171,15 @@
 
                 <!-- Controles de Filtro -->
                 <div class="history-controls">
-                    <button type="button" class="type-btn" id="history-filter-entry">Entradas</button>
-                    <button type="button" class="type-btn" id="history-filter-exit">Salidas</button>
+                    <button type="button" class="type-btn" id="history-filter-entry"><i class="fa-solid fa-arrow-down"></i> Entradas</button>
+                    <button type="button" class="type-btn" id="history-filter-exit"><i class="fa-solid fa-arrow-up"></i> Salidas</button>
                     <input type="date" id="history-date-filter">
                     <select id="history-product-filter" class="hidden"><option value="">Filtrar Producto...</option></select>
                     <div id="history-stock-display" class="hidden">Stock: -</div>
-                    <button id="history-clear-filters">Limpiar Filtros</button>
-                    <button id="btn-manage-stock" class="hidden">👥 Permisos</button>
-                    <button id="btn-export-excel" class="hidden btn-excel">Excel</button>
-                    <button id="btn-export-word" class="hidden btn-word">Word</button>
+                    <button id="history-clear-filters"><i class="fa-solid fa-filter-circle-xmark"></i> Limpiar Filtros</button>
+                    <button id="btn-manage-stock" class="hidden"><i class="fa-solid fa-users-gear"></i> Permisos</button>
+                    <button id="btn-export-excel" class="hidden btn-excel"><i class="fa-solid fa-file-excel"></i> Excel</button>
+                    <button id="btn-export-word" class="hidden btn-word"><i class="fa-solid fa-file-word"></i> Word</button>
                 </div>
 
                 <!-- Tabla de Historial -->
@@ -216,7 +222,7 @@
                     <option value="Administrador">Administrador</option>
                     <option value="Operario">Operario</option>
                 </select>
-                <button type="submit">Crear Usuario</button>
+                <button type="submit"><i class="fa-solid fa-check"></i> Crear Usuario</button>
             </form>
             <p id="modal-msg" class="error"></p>
         </div>
@@ -231,7 +237,7 @@
             <form id="form-change-pass">
                 <input type="password" id="new-pass-admin" placeholder="Nueva contraseña" required>
                 <input type="password" id="confirm-pass-admin" placeholder="Confirmar contraseña" required>
-                <button type="submit">Actualizar Contraseña</button>
+                <button type="submit"><i class="fa-solid fa-save"></i> Actualizar Contraseña</button>
             </form>
             <p id="modal-pass-msg" class="error"></p>
         </div>
@@ -245,7 +251,7 @@
             <form id="form-update-data">
                 <input type="text" id="update-name" placeholder="Nombre completo" required>
                 <input type="email" id="update-email" placeholder="Correo electrónico" required>
-                <button type="submit">Guardar Cambios</button>
+                <button type="submit"><i class="fa-solid fa-save"></i> Guardar Cambios</button>
             </form>
             <p id="modal-update-msg" class="error"></p>
         </div>
@@ -267,7 +273,7 @@
                     <option value="Administrador">Administrador</option>
                     <option value="Operario">Operario</option>
                 </select>
-                <button type="submit">Guardar Cambios</button>
+                <button type="submit"><i class="fa-solid fa-save"></i> Guardar Cambios</button>
             </form>
             <p id="modal-edit-msg" class="error"></p>
         </div>
@@ -286,7 +292,7 @@
                     <option value="Kg">Kg</option>
                     <option value="gal">gal</option>
                 </select>
-                <button type="submit">Guardar Producto</button>
+                <button type="submit"><i class="fa-solid fa-save"></i> Guardar Producto</button>
             </form>
             <p id="modal-product-msg" class="error"></p>
         </div>
@@ -302,8 +308,8 @@
                 <div id="inventory-rows-container">
                     <!-- Aquí se agregan las filas dinámicamente -->
                 </div>
-                <button type="button" id="btn-add-row" style="background-color: #6c757d; margin-bottom: 15px;">+ Agregar otro producto</button>
-                <button type="submit">Guardar Inventario</button>
+                <button type="button" id="btn-add-row" style="background-color: #6c757d; margin-bottom: 15px;"><i class="fa-solid fa-plus"></i> Agregar otro producto</button>
+                <button type="submit"><i class="fa-solid fa-save"></i> Guardar Inventario</button>
             </form>
             <p id="modal-inventory-msg" class="error"></p>
         </div>
@@ -316,7 +322,7 @@
             <h2>Permisos de Stock</h2>
             <p style="font-size: 0.9rem; color: #666; margin-bottom: 15px;">Selecciona los operarios que podrán ver el stock.</p>
             <div id="stock-permissions-list" style="max-height: 300px; overflow-y: auto; margin-bottom: 15px; border: 1px solid #eee; padding: 10px;"></div>
-            <button id="btn-save-stock-permissions">Guardar Permisos</button>
+            <button id="btn-save-stock-permissions"><i class="fa-solid fa-save"></i> Guardar Permisos</button>
         </div>
     </div>
 
@@ -349,7 +355,7 @@
                 <label>Nueva Foto Factura (Opcional):</label>
                 <input type="file" id="edit-reg-photo-invoice" accept="image/*">
 
-                <button type="submit" style="margin-top: 15px;">Guardar Cambios</button>
+                <button type="submit" style="margin-top: 15px;"><i class="fa-solid fa-save"></i> Guardar Cambios</button>
             </form>
             <p id="modal-edit-registry-msg" class="error"></p>
         </div>
