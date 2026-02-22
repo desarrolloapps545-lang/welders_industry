@@ -1,0 +1,349 @@
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: #f0f2f5;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    margin: 0;
+}
+
+.container {
+    background-color: white;
+    padding: 2rem;
+    border-radius: 10px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    width: 100%;
+    max-width: 400px;
+    text-align: center;
+    /* Centrado absoluto solo para login */
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+
+h1 {
+    color: #333;
+    margin-bottom: 0.5rem;
+}
+
+h2 {
+    color: #666;
+    font-size: 1.2rem;
+    margin-bottom: 1.5rem;
+}
+
+input {
+    width: 100%;
+    padding: 10px;
+    margin: 10px 0;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    box-sizing: border-box;
+}
+
+select {
+    width: 100%;
+    padding: 10px;
+    margin: 10px 0;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    box-sizing: border-box;
+}
+
+button {
+    width: 100%;
+    padding: 10px;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 1rem;
+    margin-top: 10px;
+}
+
+button:hover {
+    background-color: #0056b3;
+}
+
+.error {
+    color: red;
+    font-size: 0.9rem;
+    margin-top: 10px;
+}
+
+/* Clase utilitaria para ocultar pantallas */
+.hidden {
+    display: none !important;
+}
+
+/* --- Layout Dashboard --- */
+.dashboard-layout {
+    display: flex;
+    width: 100%;
+    height: 100vh;
+}
+
+.sidebar {
+    width: 250px;
+    background-color: #343a40;
+    color: white;
+    flex-direction: column;
+    padding: 20px;
+    display: flex;
+}
+
+.sidebar h2 {
+    color: white;
+    margin-bottom: 30px;
+    text-align: center;
+}
+
+.sidebar-nav {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.nav-btn {
+    background-color: transparent;
+    text-align: left;
+    padding: 12px;
+    margin: 0;
+}
+
+.nav-btn:hover {
+    background-color: #495057;
+}
+
+.nav-btn.logout {
+    margin-top: auto;
+    background-color: #dc3545;
+}
+
+.main-content {
+    flex-grow: 1;
+    padding: 20px;
+    overflow-y: auto;
+    background-color: #f0f2f5;
+}
+
+.workspace {
+    width: 100%;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+/* --- Estilos Gestión de Usuarios --- */
+
+.user-controls {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 20px;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+.control-btn {
+    width: auto;
+    padding: 8px 15px;
+    font-size: 0.9rem;
+    margin-top: 0;
+    background-color: #28a745;
+}
+
+.table-container {
+    overflow-x: auto;
+    margin-bottom: 20px;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 10px;
+}
+
+th, td {
+    padding: 10px;
+    border: 1px solid #ddd;
+    text-align: left;
+}
+
+th {
+    background-color: #f8f9fa;
+    font-weight: bold;
+}
+
+.action-btn {
+    width: 25px;
+    height: 25px;
+    padding: 0;
+    margin: 0 2px;
+    border-radius: 3px;
+    background-color: #6c757d;
+    display: inline-block;
+}
+
+/* --- Modal --- */
+.modal {
+    position: fixed;
+    z-index: 1000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0,0,0,0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.modal-content {
+    background-color: white;
+    padding: 20px;
+    border-radius: 10px;
+    width: 90%;
+    max-width: 400px;
+    position: relative;
+}
+
+.close-modal {
+    position: absolute;
+    top: 10px;
+    right: 15px;
+    font-size: 24px;
+    cursor: pointer;
+    color: #aaa;
+}
+
+/* --- Estilos Inventario --- */
+.inventory-row {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    margin-bottom: 10px;
+}
+
+.inventory-row select, .inventory-row input {
+    margin: 0;
+    flex: 1;
+}
+
+.unit-display {
+    width: 40px;
+    font-weight: bold;
+    color: #555;
+}
+
+.btn-remove-row {
+    background-color: #dc3545;
+    width: auto;
+    padding: 8px 12px;
+    margin: 0;
+}
+
+/* --- Estilos Registro --- */
+.registry-container {
+    max-width: 600px;
+    margin: 0 auto;
+    background: white;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.registry-type-selector {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 20px;
+}
+
+.type-btn {
+    flex: 1;
+    padding: 15px;
+    border: 2px solid #ddd;
+    background-color: #f8f9fa;
+    color: #555;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+
+.type-btn.active {
+    background-color: #007bff;
+    color: white;
+    border-color: #0056b3;
+}
+
+/* --- Estilos Historial --- */
+.history-controls {
+    display: flex;
+    align-items: center; /* Alinea verticalmente los elementos */
+    gap: 10px;
+    margin-bottom: 20px;
+    flex-wrap: wrap; /* Permite que los filtros pasen a la siguiente línea en pantallas pequeñas */
+}
+
+/* Estilo base para todos los elementos dentro del contenedor de filtros */
+.history-controls > * {
+    padding: 8px 12px;
+    height: 38px; /* Altura consistente para todos los elementos */
+    box-sizing: border-box;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    margin: 0;
+    width: auto;
+    font-family: inherit;
+}
+
+/* Estilos específicos para los botones de filtro */
+.history-controls .type-btn {
+    background-color: #f8f9fa;
+    color: #555;
+    border-color: #ddd;
+    font-weight: bold;
+    cursor: pointer;
+    flex: none;
+}
+
+/* Botón de limpiar filtros */
+#history-clear-filters {
+    background-color: #6c757d;
+    color: white;
+    border-color: #6c757d;
+    cursor: pointer;
+}
+
+#history-clear-filters:hover {
+    background-color: #5a6268;
+}
+
+/* Estilos para el visualizador de stock */
+#history-stock-display {
+    display: flex;
+    align-items: center;
+    font-weight: bold;
+    background-color: #e9ecef;
+}
+
+/* Botón de permisos */
+#btn-manage-stock {
+    background-color: #17a2b8;
+    border-color: #17a2b8;
+    color: white;
+}
+
+/* Botones de Exportación */
+.btn-excel {
+    background-color: #28a745;
+    color: white;
+    border-color: #28a745;
+}
+
+.btn-word {
+    background-color: #007bff;
+    color: white;
+    border-color: #007bff;
+}

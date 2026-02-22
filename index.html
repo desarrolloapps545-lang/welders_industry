@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Welders Industry</title>
+    <link rel="stylesheet" href="estilos.css">
+    <!-- Importar Supabase desde CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <!-- Importar ExcelJS y FileSaver para exportación limpia -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/exceljs/4.3.0/exceljs.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
+</head>
+<body>
+
+    <!-- Contenedor solo para Login -->
+    <div class="container" id="login-container">
+        <!-- Pantalla de Inicio de Sesión -->
+        <div id="login-screen">
+            <h1>Welders Industry</h1>
+            <h2>Iniciar Sesión</h2>
+            <form id="login-form">
+                <input type="email" id="email" placeholder="Correo electrónico" required>
+                <input type="password" id="password" placeholder="Contraseña" required>
+                <button type="submit" id="login-btn">Ingresar</button>
+            </form>
+            <p id="error-msg" class="error hidden"></p>
+        </div>
+    </div>
+
+    <!-- Pantalla Principal (Dashboard) con Sidebar -->
+    <div id="dashboard-screen" class="dashboard-layout hidden">
+        <aside class="sidebar">
+            <h2>Welders Industry</h2>
+            <nav class="sidebar-nav">
+                <button id="btn-users" class="nav-btn">Gestion de usuarios</button>
+                <button id="btn-products" class="nav-btn">Productos</button>
+                <button id="btn-inventory" class="nav-btn">Inventario</button>
+                <button id="btn-registry" class="nav-btn">Registro</button>
+                <button id="btn-history" class="nav-btn">Historial</button>
+                <button id="logout-btn" class="nav-btn logout">Cerrar Sesión</button>
+            </nav>
+        </aside>
+
+        <main class="main-content">
+            <!-- Espacios de trabajo (inicialmente ocultos) -->
+            <div id="workspace-users" class="workspace hidden">
+                <h2>Gestion de usuarios</h2>
+                
+                <!-- Botones de control -->
+                <div class="user-controls">
+                    <button id="btn-new-user" class="control-btn">Nuevo usuario</button>
+                    <button id="btn-change-pass" class="control-btn">Cambiar contraseña</button>
+                    <button id="btn-update-data" class="control-btn">Actualizacion de datos</button>
+                </div>
+
+                <!-- Tabla de usuarios -->
+                <div class="table-container">
+                    <table id="users-table">
+                        <thead>
+                            <tr>
+                                <th>Nombre</th>
+                                <th>Rol</th>
+                                <th>Correo</th>
+                                <th>Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <!-- Se llena dinámicamente con JS -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <div id="workspace-products" class="workspace hidden">
+                <h2>Productos</h2>
+                
+                <!-- Botones de control -->
+                <div class="user-controls">
+                    <button id="btn-new-product" class="control-btn">Añadir nuevo producto</button>
+                </div>
+
+                <!-- Tabla de productos -->
+                <div class="table-container">
+                    <table id="products-table">
+                        <thead>
+                            <tr>
+                                <th>Producto</th>
+                                <th>Fecha de registro</th>
+                                <th>Unidad de medida</th>
+                                <th>Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
+                </div>
+            </div>
+            <div id="workspace-inventory" class="workspace hidden">
+                <h2>Inventario</h2>
+
+                <!-- Botones de control -->
+                <div class="user-controls">
+                    <button id="btn-add-inventory" class="control-btn">Ingresar inventario</button>
+                </div>
+
+                <!-- Tabla de inventario -->
+                <div class="table-container">
+                    <table id="inventory-table">
+                        <thead>
+                            <tr>
+                                <th>Producto</th>
+                                <th>Fecha</th>
+                                <th>Cantidad</th>
+                                <th>Unidad</th>
+                                <th>Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
+                </div>
+            </div>
+            <div id="workspace-registry" class="workspace hidden">
+                <h2>Registro</h2>
+                <div class="registry-container">
+                    <div class="registry-type-selector">
+                        <button type="button" class="type-btn" id="btn-type-entry">Entrada</button>
+                        <button type="button" class="type-btn" id="btn-type-exit">Salida</button>
+                    </div>
+
+                    <form id="form-registry" class="hidden">
+                        <input type="hidden" id="registry-type-value">
+                        
+                        <label>Producto:</label>
+                        <select id="reg-product" required></select>
+
+                        <label>Cantidad:</label>
+                        <div style="display: flex; align-items: center; gap: 10px;">
+                            <input type="text" id="reg-amount" placeholder="0" required>
+                            <span id="reg-unit-display" style="font-weight: bold;"></span>
+                        </div>
+
+                        <label>Placa de la mula:</label>
+                        <input type="text" id="reg-plate" placeholder="AAA123" required>
+
+                        <label>Foto de la placa de la mula:</label>
+                        <input type="file" id="reg-photo-plate" accept="image/*" capture="environment" required>
+
+                        <label>Foto de factura (Opcional):</label>
+                        <input type="file" id="reg-photo-invoice" accept="image/*" capture="environment">
+
+                        <button type="submit" id="btn-submit-registry" style="margin-top: 20px;">Registrar</button>
+                    </form>
+                    <p id="registry-msg" class="error"></p>
+                </div>
+            </div>
+            <div id="workspace-history" class="workspace hidden">
+                <h2>Historial de Registros</h2>
+
+                <!-- Controles de Filtro -->
+                <div class="history-controls">
+                    <button type="button" class="type-btn" id="history-filter-entry">Entradas</button>
+                    <button type="button" class="type-btn" id="history-filter-exit">Salidas</button>
+                    <input type="date" id="history-date-filter">
+                    <select id="history-product-filter" class="hidden"><option value="">Filtrar Producto...</option></select>
+                    <div id="history-stock-display" class="hidden">Stock: -</div>
+                    <button id="history-clear-filters">Limpiar Filtros</button>
+                    <button id="btn-manage-stock" class="hidden">👥 Permisos</button>
+                    <button id="btn-export-excel" class="hidden btn-excel">Excel</button>
+                    <button id="btn-export-word" class="hidden btn-word">Word</button>
+                </div>
+
+                <!-- Tabla de Historial -->
+                <div class="table-container">
+                    <table id="history-table" class="styled-table" style="width:100%;">
+                        <thead>
+                            <tr>
+                                <th>Tipo</th>
+                                <th>Fecha</th>
+                                <th>Producto</th>
+                                <th>Cantidad</th>
+                                <th>Placa</th>
+                                <th>Foto Placa</th>
+                                <th>Foto Factura</th>
+                                <th>Registrado por</th>
+                            </tr>
+                        </thead>
+                        <tbody id="history-table-body">
+                            <!-- Se llena dinámicamente -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Modal Nuevo Usuario -->
+    <div id="modal-new-user" class="modal hidden">
+        <div class="modal-content">
+            <span class="close-modal">&times;</span>
+            <h2>Nuevo Usuario</h2>
+            <form id="form-new-user">
+                <input type="text" id="new-name" placeholder="Nombre completo" required>
+                <input type="email" id="new-email" placeholder="Correo electrónico" required>
+                <input type="password" id="new-password" placeholder="Contraseña" required>
+                <select id="new-role" required>
+                    <option value="" disabled selected>Seleccione un rol</option>
+                    <option value="Desarrollador">Desarrollador</option>
+                    <option value="Administrador maestro">Administrador maestro</option>
+                    <option value="Administrador">Administrador</option>
+                    <option value="Operario">Operario</option>
+                </select>
+                <button type="submit">Crear Usuario</button>
+            </form>
+            <p id="modal-msg" class="error"></p>
+        </div>
+    </div>
+
+    <!-- Modal Cambiar Contraseña (Admin) -->
+    <div id="modal-change-pass" class="modal hidden">
+        <div class="modal-content">
+            <span class="close-modal" id="close-modal-pass">&times;</span>
+            <h2>Cambiar Contraseña</h2>
+            <p style="font-size: 0.9rem; color: #666; margin-bottom: 15px;">Esto cambiará la contraseña de tu sesión actual.</p>
+            <form id="form-change-pass">
+                <input type="password" id="new-pass-admin" placeholder="Nueva contraseña" required>
+                <input type="password" id="confirm-pass-admin" placeholder="Confirmar contraseña" required>
+                <button type="submit">Actualizar Contraseña</button>
+            </form>
+            <p id="modal-pass-msg" class="error"></p>
+        </div>
+    </div>
+
+    <!-- Modal Actualizar Datos (Admin) -->
+    <div id="modal-update-data" class="modal hidden">
+        <div class="modal-content">
+            <span class="close-modal" id="close-modal-update">&times;</span>
+            <h2>Actualizar Mis Datos</h2>
+            <form id="form-update-data">
+                <input type="text" id="update-name" placeholder="Nombre completo" required>
+                <input type="email" id="update-email" placeholder="Correo electrónico" required>
+                <button type="submit">Guardar Cambios</button>
+            </form>
+            <p id="modal-update-msg" class="error"></p>
+        </div>
+    </div>
+
+    <!-- Modal Editar Usuario (Terceros) -->
+    <div id="modal-edit-user" class="modal hidden">
+        <div class="modal-content">
+            <span class="close-modal" id="close-modal-edit">&times;</span>
+            <h2>Editar Usuario</h2>
+            <form id="form-edit-user">
+                <input type="hidden" id="edit-user-id">
+                <input type="text" id="edit-name" placeholder="Nombre completo" required>
+                <input type="email" id="edit-email" placeholder="Correo electrónico" required>
+                <select id="edit-role" required>
+                    <option value="" disabled>Seleccione un rol</option>
+                    <option value="Desarrollador">Desarrollador</option>
+                    <option value="Administrador maestro">Administrador maestro</option>
+                    <option value="Administrador">Administrador</option>
+                    <option value="Operario">Operario</option>
+                </select>
+                <button type="submit">Guardar Cambios</button>
+            </form>
+            <p id="modal-edit-msg" class="error"></p>
+        </div>
+    </div>
+
+    <!-- Modal Producto (Crear/Editar) -->
+    <div id="modal-product" class="modal hidden">
+        <div class="modal-content">
+            <span class="close-modal" id="close-modal-product">&times;</span>
+            <h2 id="modal-product-title">Nuevo Producto</h2>
+            <form id="form-product">
+                <input type="hidden" id="product-id">
+                <input type="text" id="product-name" placeholder="Nombre del producto" required>
+                <label for="product-unit" style="display:block; margin-top:10px; color:#666;">Unidad de medida:</label>
+                <select id="product-unit" required>
+                    <option value="Kg">Kg</option>
+                    <option value="gal">gal</option>
+                </select>
+                <button type="submit">Guardar Producto</button>
+            </form>
+            <p id="modal-product-msg" class="error"></p>
+        </div>
+    </div>
+
+    <!-- Modal Inventario (Ingreso/Edición) -->
+    <div id="modal-inventory" class="modal hidden">
+        <div class="modal-content" style="max-width: 600px;">
+            <span class="close-modal" id="close-modal-inventory">&times;</span>
+            <h2 id="modal-inventory-title">Ingresar Inventario</h2>
+            <form id="form-inventory">
+                <input type="hidden" id="inventory-edit-id"> <!-- Solo para edición -->
+                <div id="inventory-rows-container">
+                    <!-- Aquí se agregan las filas dinámicamente -->
+                </div>
+                <button type="button" id="btn-add-row" style="background-color: #6c757d; margin-bottom: 15px;">+ Agregar otro producto</button>
+                <button type="submit">Guardar Inventario</button>
+            </form>
+            <p id="modal-inventory-msg" class="error"></p>
+        </div>
+    </div>
+
+    <!-- Modal Permisos de Stock -->
+    <div id="modal-stock-permissions" class="modal hidden">
+        <div class="modal-content">
+            <span class="close-modal" id="close-modal-stock">&times;</span>
+            <h2>Permisos de Stock</h2>
+            <p style="font-size: 0.9rem; color: #666; margin-bottom: 15px;">Selecciona los operarios que podrán ver el stock.</p>
+            <div id="stock-permissions-list" style="max-height: 300px; overflow-y: auto; margin-bottom: 15px; border: 1px solid #eee; padding: 10px;"></div>
+            <button id="btn-save-stock-permissions">Guardar Permisos</button>
+        </div>
+    </div>
+
+    <!-- Modal para ver imágenes -->
+    <div id="modal-image-viewer" class="modal hidden">
+        <div class="modal-content" style="padding: 10px; background: #fff; max-width: 90vw; max-height: 90vh;">
+            <span class="close-modal" id="close-modal-image">&times;</span>
+            <img id="modal-image-content" src="" alt="Vista de imagen" style="width: 100%; height: auto; max-height: 85vh; object-fit: contain;">
+        </div>
+    </div>
+
+    <script src="funcionalidades.js"></script>
+</body>
+</html>
