@@ -731,6 +731,29 @@ formProduct.addEventListener('submit', async (e) => {
             .from('products')
             .insert([productData]);
         error = insertError;
+
+        // Inicializar automáticamente en inventario con cantidad 0
+        if (!error) {
+            // Verificar existencia previa para evitar duplicados
+            const { data: existingInv } = await supabaseClient
+                .from('inventory')
+                .select('id')
+                .eq('product', name)
+                .maybeSingle();
+
+            if (!existingInv) {
+                const { error: invError } = await supabaseClient
+                    .from('inventory')
+                    .insert([{
+                        product: name,
+                        product_amount: 0,
+                        measurement_unit: unit,
+                        inventory_date: productData.registration_date
+                    }]);
+                
+                if (invError) console.error("Error al inicializar inventario:", invError);
+            }
+        }
     }
 
     if (error) {
