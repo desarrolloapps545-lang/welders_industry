@@ -16,6 +16,7 @@ const passwordInput = document.getElementById('password');
 const errorMsg = document.getElementById('error-msg');
 const logoutBtn = document.getElementById('logout-btn');
 const btnRefresh = document.getElementById('btn-refresh');
+const rememberMeCheckbox = document.getElementById('remember-me');
 
 // --- Elementos del Menú y Workspaces ---
 const workspaces = document.querySelectorAll('.workspace');
@@ -252,6 +253,17 @@ async function manejarInicioSesion(e) {
         menuUsers.classList.remove('hidden');
         menuProducts.classList.remove('hidden');
         menuInventory.classList.remove('hidden');
+    }
+
+    // Guardar credenciales si se solicitó
+    if (rememberMeCheckbox && rememberMeCheckbox.checked) {
+        localStorage.setItem('welder_email', email);
+        localStorage.setItem('welder_password', password);
+        localStorage.setItem('welder_remember', 'true');
+    } else {
+        localStorage.removeItem('welder_email');
+        localStorage.removeItem('welder_password');
+        localStorage.removeItem('welder_remember');
     }
 
     // 4. Mostrar Dashboard
@@ -1945,6 +1957,13 @@ document.addEventListener('DOMContentLoaded', async () => {
     } finally {
         // Ocultar pantalla de carga
         loadingScreen.classList.add('hidden');
+
+        // Cargar datos recordados si existen
+        if (localStorage.getItem('welder_remember') === 'true') {
+            emailInput.value = localStorage.getItem('welder_email') || '';
+            passwordInput.value = localStorage.getItem('welder_password') || '';
+            if (rememberMeCheckbox) rememberMeCheckbox.checked = true;
+        }
     }
 });
 
