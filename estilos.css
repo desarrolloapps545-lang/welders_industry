@@ -101,7 +101,7 @@ button:hover {
 
 .sidebar {
     width: 250px;
-    background-color: #343a40;
+    background: linear-gradient(to bottom, #434343 0%, #ffffff 100%);
     color: white;
     flex-direction: column;
     padding: 20px;
@@ -126,26 +126,25 @@ button:hover {
 }
 
 .nav-btn {
-    background-color: transparent;
+    background: linear-gradient(to bottom, #d32f2f, #8b0000);
+    color: white;
     text-align: center;
     padding: 12px;
     margin: 0;
-    border: 2px solid #dc3545;
+    border: 2px solid #8b0000;
     border-radius: 8px;
 }
 
 .nav-btn:hover {
-    background-color: #495057;
+    background: linear-gradient(to bottom, #e53935, #b71c1c);
 }
 
 .nav-btn.refresh-btn {
-    background-color: #17a2b8; /* Color distintivo para actualizar */
     margin-top: 10px;
 }
 
 .nav-btn.logout {
     margin-top: auto;
-    background-color: #dc3545;
 }
 
 .main-content {
