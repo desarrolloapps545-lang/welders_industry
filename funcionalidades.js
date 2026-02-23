@@ -413,9 +413,9 @@ async function cargarUsuarios() {
         let accionesHtml = '';
         if (myLevel > targetLevel) {
             accionesHtml = `
-                <button class="action-btn" style="background-color:#ffc107" title="Editar" onclick="prepararEdicion('${user.id}')"><i class="fa-solid fa-pen"></i></button>
-                <button class="action-btn" style="background-color:#17a2b8" title="Contraseña" onclick="abrirModalPassword('${user.id}')"><i class="fa-solid fa-key"></i></button>
-                <button class="action-btn" style="background-color:#dc3545" title="Eliminar" onclick="eliminarUsuario('${user.id}')"><i class="fa-solid fa-trash"></i></button>
+                <button class="action-btn" title="Editar" onclick="prepararEdicion('${user.id}')"><i class="fa-solid fa-pen"></i></button>
+                <button class="action-btn" title="Contraseña" onclick="abrirModalPassword('${user.id}')"><i class="fa-solid fa-key"></i></button>
+                <button class="action-btn" title="Eliminar" onclick="eliminarUsuario('${user.id}')"><i class="fa-solid fa-trash"></i></button>
             `;
         }
         const row = document.createElement('tr');
@@ -675,8 +675,8 @@ async function cargarProductos() {
             <td>${prod.registration_date}</td>
             <td>${prod.measurement_unit}</td>
             <td>
-                <button class="action-btn" style="background-color:#ffc107" title="Editar" onclick="prepararEdicionProducto('${prod.id}')"><i class="fa-solid fa-pen"></i></button>
-                <button class="action-btn" style="background-color:#dc3545" title="Eliminar" onclick="eliminarProducto('${prod.id}')"><i class="fa-solid fa-trash"></i></button>
+                <button class="action-btn" title="Editar" onclick="prepararEdicionProducto('${prod.id}')"><i class="fa-solid fa-pen"></i></button>
+                <button class="action-btn" title="Eliminar" onclick="eliminarProducto('${prod.id}')"><i class="fa-solid fa-trash"></i></button>
             </td>
         `;
         productsTableBody.appendChild(row);
@@ -840,8 +840,8 @@ async function cargarInventario() {
             <td>${formattedAmount}</td>
             <td>${unit}</td>
             <td>
-                <button class="action-btn" style="background-color:#ffc107" title="Editar" onclick="prepararEdicionInventario('${item.id}')"><i class="fa-solid fa-pen"></i></button>
-                <button class="action-btn" style="background-color:#dc3545" title="Eliminar" onclick="eliminarInventario('${item.id}')"><i class="fa-solid fa-trash"></i></button>
+                <button class="action-btn" title="Editar" onclick="prepararEdicionInventario('${item.id}')"><i class="fa-solid fa-pen"></i></button>
+                <button class="action-btn" title="Eliminar" onclick="eliminarInventario('${item.id}')"><i class="fa-solid fa-trash"></i></button>
             </td>
         `;
         inventoryTableBody.appendChild(row);

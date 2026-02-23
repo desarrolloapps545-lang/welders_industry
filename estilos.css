@@ -103,6 +103,7 @@ button:hover {
     height: 100vh;
 }
 
+
 .sidebar {
     width: 250px;
     background: linear-gradient(to bottom, #434343 0%, #a9a9a9 100%);
@@ -111,6 +112,7 @@ button:hover {
     padding: 20px;
     display: flex;
 }
+
 
 /* Logo en Sidebar */
 .sidebar-logo {
@@ -122,6 +124,7 @@ button:hover {
     padding: 5px;
     background-color: white;
 }
+
 
 .sidebar-nav {
     display: flex;
@@ -143,9 +146,34 @@ button:hover {
     opacity: 0.9;
 }
 
+/* Estilos para la barra lateral colapsada */
+.sidebar.collapsed {
+    width: 50px; /* Ancho reducido */
+    overflow: hidden;
+    transition: width 0.3s ease; /* Transición suave */
+}
+
+/* Estilos para el icono de colapso/expansión */
+.sidebar-toggle-icon {
+    cursor: pointer;
+    margin-bottom: 10px;
+    /* Estilos adicionales para el icono */
+}
+
+/* Estilos para el icono pequeño */
+.sidebar-toggle-icon img {
+    transition: all 0.3s ease;
+}
+
+/* Estilos para el icono pequeño */
+.sidebar.collapsed .sidebar-toggle-icon img {
+    transform: scale(0.6); /* Reduce el tamaño en el estado colapsado */
+}
+
 .nav-btn.refresh-btn {
     margin-top: 10px;
 }
+
 
 .nav-btn.logout {
     margin-top: auto;
@@ -155,6 +183,7 @@ button:hover {
     flex-grow: 1;
     padding: 20px;
     overflow-y: auto;
+
     background-color: #f0f2f5;
 }
 
@@ -225,14 +254,20 @@ th {
     padding: 0;
     margin: 0 2px;
     border-radius: 3px;
-    background-color: #6c757d;
+    background: linear-gradient(135deg, #8B0000 0%, #FF0000 100%); /* Rojo metálico */
     display: inline-flex;
     justify-content: center;
     align-items: center;
+    color: white;
+    border: none;
 }
 
 .action-btn i {
     margin-right: 0;
+}
+
+.action-btn:hover {
+    opacity: 0.85;
 }
 
 /* --- Modal --- */
@@ -265,6 +300,16 @@ th {
     font-size: 24px;
     cursor: pointer;
     color: #aaa;
+}
+
+/* Estilos para los botones de los modales */
+.modal-content button {
+    background: linear-gradient(135deg, #000000 0%, #434343 100%);
+}
+
+.modal-content button:hover {
+    background: linear-gradient(135deg, #000000 0%, #434343 100%);
+    opacity: 0.9;
 }
 
 /* --- Estilos Inventario --- */
@@ -401,4 +446,18 @@ th {
 @keyframes spin {
     0% { transform: rotate(0deg); }
     100% { transform: rotate(360deg); }
+}
+
+/* Estilos para ocultar la barra lateral en pantallas pequeñas */
+@media (max-width: 768px) {
+    .sidebar {
+        position: fixed;
+        top: 0;
+        left: 0;
+        z-index: 1000;
+        height: 100%;
+        width: 0; /* Inicialmente oculto */
+        overflow-x: hidden; /* Oculta el contenido que se desborda */
+        transition: width 0.3s ease-in-out; /* Animación suave */
+    }
 }
