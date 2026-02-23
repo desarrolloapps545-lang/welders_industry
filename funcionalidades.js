@@ -337,13 +337,13 @@ async function manejarInicioSesion(e) {
 
     // Guardar credenciales si se solicitó
     if (rememberMeCheckbox && rememberMeCheckbox.checked) {
-        localStorage.setItem('welder_email', email);
-        localStorage.setItem('welder_password', password);
-        localStorage.setItem('welder_remember', 'true');
+        localStorage.setItem('petromax_email', email);
+        localStorage.setItem('petromax_password', password);
+        localStorage.setItem('petromax_remember', 'true');
     } else {
-        localStorage.removeItem('welder_email');
-        localStorage.removeItem('welder_password');
-        localStorage.removeItem('welder_remember');
+        localStorage.removeItem('petromax_email');
+        localStorage.removeItem('petromax_password');
+        localStorage.removeItem('petromax_remember');
     }
 
     // 5. Ocultar Carga y Mostrar Pantalla de Bienvenida
@@ -1771,7 +1771,7 @@ async function exportarHistorial(tipo) {
         };
 
         // 1. Encabezado del Reporte
-        worksheet.addRow(['Reporte de Historial - Welders Industry']).font = { bold: true, size: 14 };
+        worksheet.addRow(['Reporte de Historial - Petromax']).font = { bold: true, size: 14 };
         worksheet.addRow([`Fecha de descarga: ${downloadDate}`]);
         worksheet.addRow([`Descargado por: ${downloaderName}`]);
         worksheet.addRow([]); // Espacio
@@ -1834,7 +1834,7 @@ async function exportarHistorial(tipo) {
 
         // Generar y descargar
         const buffer = await workbook.xlsx.writeBuffer();
-        saveAs(new Blob([buffer]), `Historial_Welders_${new Date().toISOString().slice(0,10)}.xlsx`);
+        saveAs(new Blob([buffer]), `Historial_Petromax_${new Date().toISOString().slice(0,10)}.xlsx`);
         return;
     }
 
@@ -1885,7 +1885,7 @@ async function exportarHistorial(tipo) {
         </head>
         <body>
             <div style="width: 100%;">
-                <h2 style="text-align: left; margin-bottom: 5px;">Reporte de Historial - Welders Industry</h2>
+                <h2 style="text-align: left; margin-bottom: 5px;">Reporte de Historial - Petromax</h2>
                 <p style="margin: 0;"><b>Fecha de descarga:</b> ${downloadDate}</p>
                 <p style="margin: 0;"><b>Descargado por:</b> ${downloaderName}</p>
                 <br>
@@ -1938,7 +1938,7 @@ async function exportarHistorial(tipo) {
     const extension = 'doc';
     
     const blob = new Blob(['<meta charset="UTF-8">' + tableHTML], { type: mime });
-    saveAs(blob, `Historial_Welders_${new Date().toISOString().slice(0,10)}.${extension}`);
+    saveAs(blob, `Historial_Petromax_${new Date().toISOString().slice(0,10)}.${extension}`);
 }
 
 btnExportExcel.addEventListener('click', () => exportarHistorial('excel'));
@@ -2087,9 +2087,9 @@ document.addEventListener('DOMContentLoaded', async () => {
         loadingScreen.classList.add('hidden');
 
         // Cargar datos recordados si existen
-        if (localStorage.getItem('welder_remember') === 'true') {
-            emailInput.value = localStorage.getItem('welder_email') || '';
-            passwordInput.value = localStorage.getItem('welder_password') || '';
+        if (localStorage.getItem('petromax_remember') === 'true') {
+            emailInput.value = localStorage.getItem('petromax_email') || '';
+            passwordInput.value = localStorage.getItem('petromax_password') || '';
             if (rememberMeCheckbox) rememberMeCheckbox.checked = true;
         }
     }
