@@ -55,6 +55,9 @@
         <button id="btn-logout-welcome" class="nav-btn logout" style="margin-top: 20px; background: #dc3545; border-color: #dc3545;"><i class="fa-solid fa-right-from-bracket"></i> Cerrar Sesión</button>
     </div>
 
+    <!-- Overlay para móvil -->
+    <div id="sidebar-overlay" class="sidebar-overlay"></div>
+
     <!-- Pantalla Principal (Dashboard) con Sidebar -->
     <div id="dashboard-screen" class="dashboard-layout hidden">
         <aside class="sidebar">
@@ -377,9 +380,9 @@
 
     <!-- Modal para ver imágenes -->
     <div id="modal-image-viewer" class="modal hidden">
-        <div class="modal-content" style="padding: 10px; background: #fff; max-width: 90vw; max-height: 90vh;">
+        <div class="modal-content">
             <span class="close-modal" id="close-modal-image">&times;</span>
-            <img id="modal-image-content" src="" alt="Vista de imagen" style="width: 100%; height: auto; max-height: 85vh; object-fit: contain;">
+            <img id="modal-image-content" src="" alt="Vista de imagen">
         </div>
     </div>
 

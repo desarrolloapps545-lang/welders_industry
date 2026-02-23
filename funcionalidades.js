@@ -122,18 +122,45 @@ const editRegProductSelect = document.getElementById('edit-reg-product');
 // --- Elementos Sidebar ---
 const sidebar = document.querySelector('.sidebar');
 const sidebarLogo = document.querySelector('.sidebar-logo');
+const sidebarOverlay = document.getElementById('sidebar-overlay');
 
 // Evento para colapsar/expandir sidebar
 if (sidebarLogo) {
     sidebarLogo.addEventListener('click', () => {
-        sidebar.classList.toggle('collapsed');
-        if (sidebar.classList.contains('collapsed')) {
-            sidebarLogo.src = 'img/logos/hover.png';
+        if (window.innerWidth > 768) {
+            // Comportamiento de escritorio: colapsar/expandir en el lugar
+            sidebar.classList.toggle('collapsed');
+            if (sidebar.classList.contains('collapsed')) {
+                sidebarLogo.src = 'img/logos/hover.png';
+            } else {
+                sidebarLogo.src = 'img/logos/login.png';
+            }
         } else {
-            sidebarLogo.src = 'img/logos/login.png';
+            // Comportamiento móvil: abrir como overlay
+            if (sidebar.classList.contains('mobile-open')) {
+                cerrarSidebarMovil();
+            } else {
+                abrirSidebarMovil();
+            }
         }
     });
 }
+
+// --- Lógica Menú Móvil ---
+function abrirSidebarMovil() {
+    sidebar.classList.add('mobile-open');
+    sidebarOverlay.classList.add('active');
+    sidebarLogo.src = 'img/logos/login.png'; // Mostrar logo grande al expandir
+}
+
+function cerrarSidebarMovil() {
+    sidebar.classList.remove('mobile-open');
+    sidebarOverlay.classList.remove('active');
+    sidebarLogo.src = 'img/logos/hover.png'; // Mostrar logo pequeño al colapsar
+}
+
+// Cerrar al dar click en el overlay
+sidebarOverlay.addEventListener('click', cerrarSidebarMovil);
 
 // --- Variables Globales ---
 let currentUserRole = null;
@@ -178,6 +205,10 @@ function abrirWorkspace(idWorkspace) {
     const ws = document.getElementById(idWorkspace);
     if (ws) {
         ws.classList.remove('hidden');
+        
+        // Cerrar sidebar automáticamente en móvil al seleccionar opción
+        if (window.innerWidth <= 768) cerrarSidebarMovil();
+
         if (idWorkspace === 'workspace-users') {
             cargarUsuarios(); // Cargar datos al abrir la pestaña
         }

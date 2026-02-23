@@ -450,20 +450,6 @@ th {
     100% { transform: rotate(360deg); }
 }
 
-/* Estilos para ocultar la barra lateral en pantallas pequeñas */
-@media (max-width: 768px) {
-    .sidebar {
-        position: fixed;
-        top: 0;
-        left: 0;
-        z-index: 1000;
-        height: 100%;
-        width: 0; /* Inicialmente oculto */
-        overflow-x: hidden; /* Oculta el contenido que se desborda */
-        transition: width 0.3s ease-in-out; /* Animación suave */
-    }
-}
-
 /* Animación de entrada para el dashboard */
 @keyframes fadeIn {
     from { opacity: 0; transform: translateY(10px); }
@@ -494,4 +480,171 @@ th {
 
 .view-btn:hover {
     opacity: 0.85;
+}
+
+/* Estilos específicos para el modal de visualización de imágenes */
+#modal-image-viewer .modal-content {
+    width: auto;
+    max-width: 90vw;
+    max-height: 90vh;
+    padding: 25px; /* Espacio suficiente para el botón de cerrar */
+}
+
+#modal-image-content {
+    border-radius: 15px; /* Bordes curvos en la foto */
+    max-height: 80vh;
+    width: auto;
+    max-width: 100%;
+    object-fit: contain;
+}
+
+/* --- Estilos Responsivos y Menú Móvil --- */
+
+/* Overlay para fondo oscuro en móvil */
+.sidebar-overlay {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0,0,0,0.5);
+    z-index: 999; /* Debajo del sidebar (1000) */
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.sidebar-overlay.active {
+    display: block;
+    opacity: 1;
+}
+
+/* Media Queries para Pantallas Pequeñas */
+@media (max-width: 768px) {
+    .sidebar {
+        /* Por defecto, la barra es fija y colapsada */
+        width: 80px;
+        overflow: hidden;
+        white-space: nowrap;
+    }
+
+    /* Estilos de colapsado por defecto en móvil */
+    .sidebar .sidebar-logo {
+        max-width: 50px;
+        padding: 0;
+        border: none;
+        background-color: transparent;
+    }
+    .sidebar .nav-btn {
+        font-size: 0;
+        padding: 15px 0;
+    }
+    .sidebar .nav-btn i {
+        font-size: 1.5rem;
+        margin: 0;
+    }
+
+    /* Estado expandido en móvil (overlay) */
+    .sidebar.mobile-open {
+        width: 250px; /* Ancho completo al abrir */
+    }
+
+    /* Revertir estilos para la barra expandida en móvil */
+    .sidebar.mobile-open .sidebar-logo {
+        max-width: 95%;
+        margin: 0 auto 30px auto;
+        border: 2px solid #dc3545;
+        background-color: white;
+        padding: 5px;
+    }
+    .sidebar.mobile-open .nav-btn {
+        font-size: 1rem;
+        padding: 12px;
+    }
+    .sidebar.mobile-open .nav-btn i {
+        margin-right: 8px;
+        font-size: 1rem;
+    }
+
+    /* Ajuste de encabezados de workspace */
+    .workspace h2 {
+        display: flex;
+        align-items: center;
+        font-size: 1.5rem;
+        padding: 10px;
+    }
+
+    /* Dejar espacio para la barra lateral colapsada */
+    .main-content {
+        padding-left: 80px;
+    }
+
+    /* Tablas Responsivas */
+    th, td {
+        font-size: 0.8rem;
+        padding: 8px 5px;
+    }
+
+    .action-btn {
+        width: 28px;
+        height: 28px;
+    }
+
+    /* Formularios e Inventario en columna */
+    .inventory-row {
+        flex-wrap: wrap;
+        border-bottom: 1px solid #eee;
+        padding-bottom: 10px;
+        margin-bottom: 10px;
+    }
+
+    .inventory-row select, 
+    .inventory-row input {
+        flex: 1 1 100%;
+        margin: 5px 0;
+    }
+
+    /* Controles de Historial en columna */
+    .history-controls {
+        flex-direction: column;
+        align-items: stretch;
+    }
+    
+    .history-controls > * {
+        width: 100%;
+        margin-bottom: 5px;
+    }
+    
+    /* Modales ancho completo */
+    .modal-content {
+        width: 95%;
+        max-height: 90vh;
+        overflow-y: auto;
+    }
+
+    /* Ajustar container de login y bienvenida */
+    .container {
+        width: 90%;
+        padding: 1.5rem;
+    }
+
+    /* Reducir tamaño de logo y texto en bienvenida/login para pantallas pequeñas */
+    .container .app-logo {
+        max-width: 180px;
+    }
+
+    .container h2 {
+        font-size: 1.1rem;
+        margin-bottom: 1rem;
+    }
+
+    /* Botones de bienvenida más compactos */
+    #welcome-buttons-container .nav-btn, #btn-logout-welcome {
+        padding: 10px;
+        font-size: 0.9rem;
+    }
+
+    #welcome-buttons-container {
+        gap: 8px !important;
+    }
 }
