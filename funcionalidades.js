@@ -18,6 +18,16 @@ const logoutBtn = document.getElementById('logout-btn');
 const btnRefresh = document.getElementById('btn-refresh');
 const rememberMeCheckbox = document.getElementById('remember-me');
 
+// --- Elementos Pantalla Bienvenida ---
+const welcomeContainer = document.getElementById('welcome-container');
+const welcomeTitle = document.getElementById('welcome-title');
+const btnLogoutWelcome = document.getElementById('btn-logout-welcome');
+const welcomeBtnUsers = document.getElementById('welcome-btn-users');
+const welcomeBtnProducts = document.getElementById('welcome-btn-products');
+const welcomeBtnInventory = document.getElementById('welcome-btn-inventory');
+const welcomeBtnRegistry = document.getElementById('welcome-btn-registry');
+const welcomeBtnHistory = document.getElementById('welcome-btn-history');
+
 // --- Elementos del Menú y Workspaces ---
 const workspaces = document.querySelectorAll('.workspace');
 
@@ -109,6 +119,22 @@ const formEditRegistry = document.getElementById('form-edit-registry');
 const modalEditRegistryMsg = document.getElementById('modal-edit-registry-msg');
 const editRegProductSelect = document.getElementById('edit-reg-product');
 
+// --- Elementos Sidebar ---
+const sidebar = document.querySelector('.sidebar');
+const sidebarLogo = document.querySelector('.sidebar-logo');
+
+// Evento para colapsar/expandir sidebar
+if (sidebarLogo) {
+    sidebarLogo.addEventListener('click', () => {
+        sidebar.classList.toggle('collapsed');
+        if (sidebar.classList.contains('collapsed')) {
+            sidebarLogo.src = 'img/logos/hover.png';
+        } else {
+            sidebarLogo.src = 'img/logos/login.png';
+        }
+    });
+}
+
 // --- Variables Globales ---
 let currentUserRole = null;
 let targetUserIdToUpdate = null; // Para guardar el ID del usuario a editar/cambiar pass
@@ -134,15 +160,13 @@ function cambiarPantalla(esLogin) {
     if (esLogin) {
         loginContainer.classList.remove('hidden');
         dashboardScreen.classList.add('hidden');
+        welcomeContainer.classList.add('hidden'); // Asegurar que se oculte
     } else {
         loginContainer.classList.add('hidden');
         dashboardScreen.classList.remove('hidden');
+        welcomeContainer.classList.add('hidden');
         
-        if (currentUserRole === 'Operario') {
-            abrirWorkspace('workspace-registry');
-        } else {
-            abrirWorkspace('workspace-users');
-        }
+        // La lógica de abrirWorkspace se maneja ahora desde la pantalla de bienvenida
     }
 }
 
@@ -185,22 +209,46 @@ function abrirWorkspace(idWorkspace) {
     }
 }
 
+// --- Función para mostrar Pantalla de Bienvenida ---
+function mostrarPantallaBienvenida(nombre, rol) {
+    loginContainer.classList.add('hidden');
+    dashboardScreen.classList.add('hidden');
+    welcomeContainer.classList.remove('hidden');
+    
+    welcomeTitle.textContent = `Bienvenido, ${nombre}`;
+    
+    // Lógica para mostrar/ocultar botones según rol (similar al sidebar)
+    if (rol === 'Operario') {
+        welcomeBtnUsers.classList.add('hidden');
+        welcomeBtnProducts.classList.add('hidden');
+        welcomeBtnInventory.classList.add('hidden');
+    } else {
+        welcomeBtnUsers.classList.remove('hidden');
+        welcomeBtnProducts.classList.remove('hidden');
+        welcomeBtnInventory.classList.remove('hidden');
+    }
+}
+
 // --- Lógica Principal ---
 
 async function manejarInicioSesion(e) {
     e.preventDefault();
     limpiarError();
+    
+    // 1. Mostrar Pantalla de Carga
+    loadingScreen.classList.remove('hidden');
 
     const email = emailInput.value;
     const password = passwordInput.value;
 
-    // 1. Autenticación con Supabase Auth
+    // 2. Autenticación con Supabase Auth
     const { data: authData, error: authError } = await supabaseClient.auth.signInWithPassword({
         email: email,
         password: password
     });
 
     if (authError) {
+        loadingScreen.classList.add('hidden'); // Ocultar carga si hay error
         mostrarError("Error de autenticación: " + authError.message);
         return;
     }
@@ -208,15 +256,16 @@ async function manejarInicioSesion(e) {
     const userId = authData.user.id;
     console.log("Autenticación exitosa. Verificando perfil para el usuario con ID:", userId);
 
-    // 2. Consultar la tabla 'users' para verificar permisos
+    // 3. Consultar la tabla 'users' para verificar permisos y obtener NOMBRE
     // Rectificamos si el UID existe en la columna 'id' y obtenemos 'role' e 'is_admin'
     const { data: userData, error: userError } = await supabaseClient
         .from('users')
-        .select('role, is_admin')
+        .select('role, is_admin, name') // Agregamos 'name' a la consulta
         .eq('id', userId)
         .single();
 
     if (userError) {
+        loadingScreen.classList.add('hidden');
         console.error("Error al buscar el perfil del usuario:", userError);
 
         let mensaje;
@@ -234,7 +283,7 @@ async function manejarInicioSesion(e) {
         return;
     }
 
-    // 3. Lógica de Roles solicitada
+    // 4. Lógica de Roles solicitada
     let mensajeRol = "";
 
     // Guardamos el rol globalmente para usarlo en la UI
@@ -266,8 +315,10 @@ async function manejarInicioSesion(e) {
         localStorage.removeItem('welder_remember');
     }
 
-    // 4. Mostrar Dashboard
-    cambiarPantalla(false); // Ir al dashboard
+    // 5. Ocultar Carga y Mostrar Pantalla de Bienvenida
+    loadingScreen.classList.add('hidden');
+    // Usamos el nombre de la base de datos o un fallback
+    mostrarPantallaBienvenida(userData.name || 'Usuario', userData.role);
 }
 
 async function manejarCierreSesion() {
@@ -286,6 +337,29 @@ async function manejarCierreSesion() {
 // --- Event Listeners ---
 loginForm.addEventListener('submit', manejarInicioSesion);
 logoutBtn.addEventListener('click', manejarCierreSesion);
+
+// Eventos Botones Bienvenida
+function irAlWorkspaceDesdeBienvenida(workspaceId) {
+    welcomeContainer.classList.add('hidden');
+    dashboardScreen.classList.remove('hidden');
+    
+    // Animación de entrada
+    dashboardScreen.classList.add('fade-in');
+    setTimeout(() => dashboardScreen.classList.remove('fade-in'), 500);
+    
+    // Colapsar sidebar y cambiar icono
+    sidebar.classList.add('collapsed');
+    if (sidebarLogo) sidebarLogo.src = 'img/logos/hover.png';
+    
+    abrirWorkspace(workspaceId);
+}
+
+welcomeBtnUsers.addEventListener('click', () => irAlWorkspaceDesdeBienvenida('workspace-users'));
+welcomeBtnProducts.addEventListener('click', () => irAlWorkspaceDesdeBienvenida('workspace-products'));
+welcomeBtnInventory.addEventListener('click', () => irAlWorkspaceDesdeBienvenida('workspace-inventory'));
+welcomeBtnRegistry.addEventListener('click', () => irAlWorkspaceDesdeBienvenida('workspace-registry'));
+welcomeBtnHistory.addEventListener('click', () => irAlWorkspaceDesdeBienvenida('workspace-history'));
+btnLogoutWelcome.addEventListener('click', manejarCierreSesion);
 
 // Botones del menú
 document.getElementById('btn-users').addEventListener('click', () => abrirWorkspace('workspace-users'));
@@ -1335,11 +1409,11 @@ async function cargarRegistrosHoy() {
                 : '<span style="background:#f8d7da; color:#721c24; padding:4px 8px; border-radius:4px; font-weight:bold;">Salida</span>';
 
             const btnPlate = rec.plate_url
-                ? `<button onclick="abrirModalImagen('${rec.plate_url}')" style="display:inline-block; background:#17a2b8; color:white; padding:5px 10px; border:none; text-decoration:none; border-radius:4px; cursor:pointer;"><i class="fa-solid fa-eye"></i> Ver</button>`
+                ? `<button onclick="abrirModalImagen('${rec.plate_url}')" class="view-btn"><i class="fa-solid fa-eye"></i> Ver</button>`
                 : '<span style="color:#ccc;">-</span>';
                 
             const btnInvoice = rec.invoice_url
-                ? `<button onclick="abrirModalImagen('${rec.invoice_url}')" style="display:inline-block; background:#17a2b8; color:white; padding:5px 10px; border:none; text-decoration:none; border-radius:4px; cursor:pointer;"><i class="fa-solid fa-eye"></i> Ver</button>`
+                ? `<button onclick="abrirModalImagen('${rec.invoice_url}')" class="view-btn"><i class="fa-solid fa-eye"></i> Ver</button>`
                 : '<button disabled style="background:#e9ecef; color:#adb5bd; border:none; padding:5px 10px; border-radius:4px; cursor:not-allowed;"><i class="fa-solid fa-eye-slash"></i> Ver</button>';
 
             const userCell = `<td style="padding:12px;">${rec.user_name || 'N/A'}</td>`;
@@ -1349,8 +1423,8 @@ async function cargarRegistrosHoy() {
                 // Pasamos el objeto rec completo serializado o usamos un ID para buscarlo en cache si fuera necesario.
                 // Aquí usaremos funciones globales pasando los datos clave.
                 accionesCell = `<td style="padding:12px;">
-                    <button onclick='prepararEdicionRegistro(${JSON.stringify(rec).replace(/'/g, "&#39;")})' style="background:#ffc107; border:none; padding:5px 8px; border-radius:4px; cursor:pointer; margin-right:5px;" title="Editar"><i class="fa-solid fa-pen"></i></button>
-                    <button onclick="eliminarRegistro('${rec.id}', '${rec.table}', '${rec.plate_url || ''}', '${rec.invoice_url || ''}')" style="background:#dc3545; border:none; padding:5px 8px; border-radius:4px; cursor:pointer; color:white;" title="Eliminar"><i class="fa-solid fa-trash"></i></button>
+                    <button class="action-btn" onclick='prepararEdicionRegistro(${JSON.stringify(rec).replace(/'/g, "&#39;")})' title="Editar"><i class="fa-solid fa-pen"></i></button>
+                    <button class="action-btn" onclick="eliminarRegistro('${rec.id}', '${rec.table}', '${rec.plate_url || ''}', '${rec.invoice_url || ''}')" title="Eliminar"><i class="fa-solid fa-trash"></i></button>
                 </td>`;
             }
 
@@ -1477,16 +1551,16 @@ async function cargarHistorial() {
                 ? '<span style="background:#d4edda; color:#155724; padding:4px 8px; border-radius:4px; font-weight:bold;">Entrada</span>' 
                 : '<span style="background:#f8d7da; color:#721c24; padding:4px 8px; border-radius:4px; font-weight:bold;">Salida</span>';
 
-            const btnPlate = rec.plate_url ? `<button onclick="abrirModalImagen('${rec.plate_url}')" style="display:inline-block; background:#17a2b8; color:white; padding:5px 10px; border:none; border-radius:4px; cursor:pointer;"><i class="fa-solid fa-eye"></i> Ver</button>` : '<span style="color:#ccc;">-</span>';
-            const btnInvoice = rec.invoice_url ? `<button onclick="abrirModalImagen('${rec.invoice_url}')" style="display:inline-block; background:#17a2b8; color:white; padding:5px 10px; border:none; border-radius:4px; cursor:pointer;"><i class="fa-solid fa-eye"></i> Ver</button>` : '<button disabled style="background:#e9ecef; color:#adb5bd; border:none; padding:5px 10px; border-radius:4px; cursor:not-allowed;"><i class="fa-solid fa-eye-slash"></i> Ver</button>';
+            const btnPlate = rec.plate_url ? `<button onclick="abrirModalImagen('${rec.plate_url}')" class="view-btn"><i class="fa-solid fa-eye"></i> Ver</button>` : '<span style="color:#ccc;">-</span>';
+            const btnInvoice = rec.invoice_url ? `<button onclick="abrirModalImagen('${rec.invoice_url}')" class="view-btn"><i class="fa-solid fa-eye"></i> Ver</button>` : '<button disabled style="background:#e9ecef; color:#adb5bd; border:none; padding:5px 10px; border-radius:4px; cursor:not-allowed;"><i class="fa-solid fa-eye-slash"></i> Ver</button>';
 
             const userCell = `<td style="padding:12px;">${rec.user_name || 'N/A'}</td>`;
             
             let accionesCell = '';
             if (isAdminOrDev) {
                 accionesCell = `<td style="padding:12px;">
-                    <button onclick='prepararEdicionRegistro(${JSON.stringify(rec).replace(/'/g, "&#39;")})' style="background:#ffc107; border:none; padding:5px 8px; border-radius:4px; cursor:pointer; margin-right:5px;" title="Editar"><i class="fa-solid fa-pen"></i></button>
-                    <button onclick="eliminarRegistro('${rec.id}', '${rec.table}', '${rec.plate_url || ''}', '${rec.invoice_url || ''}')" style="background:#dc3545; border:none; padding:5px 8px; border-radius:4px; cursor:pointer; color:white;" title="Eliminar"><i class="fa-solid fa-trash"></i></button>
+                    <button class="action-btn" onclick='prepararEdicionRegistro(${JSON.stringify(rec).replace(/'/g, "&#39;")})' title="Editar"><i class="fa-solid fa-pen"></i></button>
+                    <button class="action-btn" onclick="eliminarRegistro('${rec.id}', '${rec.table}', '${rec.plate_url || ''}', '${rec.invoice_url || ''}')" title="Eliminar"><i class="fa-solid fa-trash"></i></button>
                 </td>`;
             }
 
@@ -1942,7 +2016,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             // Recuperar rol del usuario desde la base de datos
             const { data: userData, error } = await supabaseClient
                 .from('users')
-                .select('role')
+                .select('role, name') // Agregamos name
                 .eq('id', userId)
                 .single();
             
@@ -1964,8 +2038,8 @@ document.addEventListener('DOMContentLoaded', async () => {
                     menuInventory.classList.remove('hidden');
                 }
 
-                // Restaurar pantalla principal
-                cambiarPantalla(false);
+                // Mostrar pantalla de bienvenida al recargar también
+                mostrarPantallaBienvenida(userData.name || 'Usuario', userData.role);
             } else {
                 // Sesión existe pero no hay datos de usuario, mostrar login
                 loginContainer.classList.remove('hidden');

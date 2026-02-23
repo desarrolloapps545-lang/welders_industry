@@ -41,6 +41,20 @@
         </div>
     </div>
 
+    <!-- Pantalla de Bienvenida -->
+    <div class="container hidden" id="welcome-container">
+        <img src="img/logos/login.png" alt="Welders Industry" class="app-logo">
+        <h2 id="welcome-title">Bienvenido</h2>
+        <div id="welcome-buttons-container" style="display: flex; flex-direction: column; gap: 10px;">
+            <button class="nav-btn" id="welcome-btn-users"><i class="fa-solid fa-users"></i> Gestion de usuarios</button>
+            <button class="nav-btn" id="welcome-btn-products"><i class="fa-solid fa-boxes-stacked"></i> Productos</button>
+            <button class="nav-btn" id="welcome-btn-inventory"><i class="fa-solid fa-warehouse"></i> Inventario</button>
+            <button class="nav-btn" id="welcome-btn-registry"><i class="fa-solid fa-pen-to-square"></i> Registro</button>
+            <button class="nav-btn" id="welcome-btn-history"><i class="fa-solid fa-clock-rotate-left"></i> Historial</button>
+        </div>
+        <button id="btn-logout-welcome" class="nav-btn logout" style="margin-top: 20px; background: #dc3545; border-color: #dc3545;"><i class="fa-solid fa-right-from-bracket"></i> Cerrar Sesión</button>
+    </div>
+
     <!-- Pantalla Principal (Dashboard) con Sidebar -->
     <div id="dashboard-screen" class="dashboard-layout hidden">
         <aside class="sidebar">
