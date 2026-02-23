@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Petromax</title>
-    <link rel="icon" href="img/logos/icon.ico" type="icon/ico">
+    <link rel="icon" href="img/logos/hover.png" type="image/png">
     <link rel="stylesheet" href="estilos.css">
     <!-- Importar Supabase desde CDN -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -13,6 +13,8 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
     <!-- Importar Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Cargar tu lógica al final del head con defer -->
+    <script src="funcionalidades.js" defer></script>
 </head>
 <body>
 
@@ -173,10 +175,10 @@
                         <input type="text" id="reg-plate" placeholder="AAA123" required>
 
                         <label>Foto de la placa de la mula:</label>
-                        <input type="file" id="reg-photo-plate" accept="image/*" capture="environment" required>
+                        <input type="file" id="reg-photo-plate" accept="image/*" capture="environment" required multiple>
 
                         <label>Foto de factura (Opcional):</label>
-                        <input type="file" id="reg-photo-invoice" accept="image/*" capture="environment">
+                        <input type="file" id="reg-photo-invoice" accept="image/*" capture="environment" multiple>
 
                         <button type="submit" id="btn-submit-registry" style="margin-top: 20px;"><i class="fa-solid fa-floppy-disk"></i> Registrar</button>
                     </form>
@@ -367,10 +369,10 @@
                 <input type="text" id="edit-reg-plate" required>
 
                 <label>Nueva Foto Placa (Opcional):</label>
-                <input type="file" id="edit-reg-photo-plate" accept="image/*">
+                <input type="file" id="edit-reg-photo-plate" accept="image/*" multiple>
 
                 <label>Nueva Foto Factura (Opcional):</label>
-                <input type="file" id="edit-reg-photo-invoice" accept="image/*">
+                <input type="file" id="edit-reg-photo-invoice" accept="image/*" multiple>
 
                 <button type="submit" style="margin-top: 15px;"><i class="fa-solid fa-save"></i> Guardar Cambios</button>
             </form>
@@ -382,10 +384,9 @@
     <div id="modal-image-viewer" class="modal hidden">
         <div class="modal-content">
             <span class="close-modal" id="close-modal-image">&times;</span>
-            <img id="modal-image-content" src="" alt="Vista de imagen">
+            <div id="modal-images-container" style="display: flex; flex-direction: column; gap: 15px; align-items: center; max-height: 80vh; overflow-y: auto;"></div>
         </div>
     </div>
 
-    <script src="funcionalidades.js"></script>
 </body>
 </html>

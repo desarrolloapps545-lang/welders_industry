@@ -37,21 +37,26 @@ serve(async (req) => {
     const getBucketFromTable = (tbl: string) => tbl === 'product_entry' ? 'entries' : 'exits';
     const bucket = getBucketFromTable(table);
 
-    // Helper para extraer el path del archivo desde la URL pública
-    const getPathFromUrl = (url: string) => {
-        if (!url) return null;
-        try {
-            const urlObj = new URL(url);
-            // Estructura típica: .../storage/v1/object/public/bucket/folder/file
-            const pathParts = urlObj.pathname.split('/');
-            const publicIndex = pathParts.indexOf('public');
-            if (publicIndex === -1) return null;
-            // El path es todo lo que sigue al nombre del bucket
-            // pathParts[publicIndex + 1] es el bucket
-            return pathParts.slice(publicIndex + 2).join('/');
-        } catch (e) {
-            return null;
-        }
+    // Helper para extraer los paths de archivos desde una cadena de URLs (separadas por coma)
+    const getPathsFromUrlString = (urlString: string | null) => {
+        if (!urlString) return [];
+        // Dividir por coma y limpiar espacios
+        const urls = urlString.split(',').map(u => u.trim()).filter(u => u.length > 0);
+        
+        return urls.map(url => {
+            try {
+                const urlObj = new URL(url);
+                // Estructura típica: .../storage/v1/object/public/bucket/folder/file
+                const pathParts = urlObj.pathname.split('/');
+                const publicIndex = pathParts.indexOf('public');
+                if (publicIndex === -1) return null;
+                // El path es todo lo que sigue al nombre del bucket
+                return pathParts.slice(publicIndex + 2).join('/');
+            } catch (e) {
+                console.warn("URL inválida o no parseable:", url);
+                return null;
+            }
+        }).filter(p => p !== null) as string[];
     }
 
     if (action === 'delete') {
@@ -94,11 +99,8 @@ serve(async (req) => {
 
         // 1. Eliminar imágenes del bucket
         const pathsToDelete: string[] = [];
-        const platePath = getPathFromUrl(plate_url);
-        if (platePath) pathsToDelete.push(platePath);
-        
-        const invoicePath = getPathFromUrl(invoice_url);
-        if (invoicePath) pathsToDelete.push(invoicePath);
+        pathsToDelete.push(...getPathsFromUrlString(plate_url));
+        pathsToDelete.push(...getPathsFromUrlString(invoice_url));
 
         if (pathsToDelete.length > 0) {
             console.log("Eliminando imágenes:", pathsToDelete);
@@ -119,15 +121,25 @@ serve(async (req) => {
         // 1. Verificar si las imágenes cambiaron para borrar las viejas
         const pathsToDelete: string[] = [];
         
-        // Si hay nueva URL y es diferente a la anterior, borramos la anterior
-        if (updates.plate_photo_url && old_plate_url && updates.plate_photo_url !== old_plate_url) {
-            const p = getPathFromUrl(old_plate_url);
-            if (p) pathsToDelete.push(p);
+        // Lógica para Placas:
+        // Si hay URLs viejas, verificamos cuáles de ellas NO están en la nueva lista de URLs.
+        // Esto maneja tanto el reemplazo total como la eliminación parcial.
+        if (old_plate_url) {
+            const oldUrls = old_plate_url.split(',').map(u => u.trim());
+            const newUrls = (updates.plate_photo_url || '').split(',').map(u => u.trim());
+            
+            // Identificar URLs viejas que ya no existen en la nueva actualización
+            const urlsToRemove = oldUrls.filter(oldU => !newUrls.includes(oldU));
+            pathsToDelete.push(...getPathsFromUrlString(urlsToRemove.join(',')));
         }
         
-        if (updates.invoice_photo_url && old_invoice_url && updates.invoice_photo_url !== old_invoice_url) {
-            const p = getPathFromUrl(old_invoice_url);
-            if (p) pathsToDelete.push(p);
+        // Lógica para Facturas:
+        if (old_invoice_url) {
+            const oldUrls = old_invoice_url.split(',').map(u => u.trim());
+            const newUrls = (updates.invoice_photo_url || '').split(',').map(u => u.trim());
+            
+            const urlsToRemove = oldUrls.filter(oldU => !newUrls.includes(oldU));
+            pathsToDelete.push(...getPathsFromUrlString(urlsToRemove.join(',')));
         }
 
         if (pathsToDelete.length > 0) {

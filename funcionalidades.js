@@ -92,7 +92,7 @@ const registryMsg = document.getElementById('registry-msg');
 // --- Elementos Modal Imagen ---
 const modalImageViewer = document.getElementById('modal-image-viewer');
 const closeModalImage = document.getElementById('close-modal-image');
-const modalImageContent = document.getElementById('modal-image-content');
+const modalImagesContainer = document.getElementById('modal-images-container');
 
 // --- Elementos Historial ---
 const historyFilterEntry = document.getElementById('history-filter-entry');
@@ -1245,10 +1245,10 @@ formRegistry.addEventListener('submit', async (e) => {
     const amountVal = regAmountInput.value.replace(/\./g, ''); // Quitar puntos para enviar número puro
     const unit = regUnitDisplay.textContent;
     const plate = regPlateInput.value;
-    const filePlate = regPhotoPlate.files[0];
-    const fileInvoice = regPhotoInvoice.files[0];
+    const filesPlate = regPhotoPlate.files;
+    const filesInvoice = regPhotoInvoice.files;
 
-    if (!filePlate) {
+    if (filesPlate.length === 0) {
         registryMsg.textContent = "La foto de la placa es obligatoria.";
         return;
     }
@@ -1265,29 +1265,33 @@ formRegistry.addEventListener('submit', async (e) => {
             throw new Error("Tipo de operación no válido. No se puede determinar el bucket de imágenes.");
         }
 
-        const timestamp = Date.now();
-        
-        // Subir Placa
-        const platePath = `placas/${timestamp}_${plate}.jpg`;
-        const { data: plateData, error: plateError } = await supabaseClient.storage
-            .from(bucketName)
-            .upload(platePath, filePlate);
-        
-        if (plateError) throw new Error("Error subiendo foto placa: " + plateError.message);
-        
-        const plateUrl = supabaseClient.storage.from(bucketName).getPublicUrl(platePath).data.publicUrl;
+        // Subir Placas (múltiples)
+        const plateUploadPromises = Array.from(filesPlate).map((file, index) => {
+            const timestamp = Date.now();
+            const platePath = `placas/${timestamp}_${plate}_${index + 1}.jpg`;
+            return supabaseClient.storage.from(bucketName).upload(platePath, file);
+        });
 
-        // Subir Factura (si existe)
-        let invoiceUrl = null;
-        if (fileInvoice) {
-            const invoicePath = `facturas/${timestamp}_${plate}.jpg`;
-            const { data: invData, error: invError } = await supabaseClient.storage
-                .from(bucketName)
-                .upload(invoicePath, fileInvoice);
-            
-            if (invError) throw new Error("Error subiendo foto factura: " + invError.message);
-            
-            invoiceUrl = supabaseClient.storage.from(bucketName).getPublicUrl(invoicePath).data.publicUrl;
+        const plateResults = await Promise.all(plateUploadPromises);
+        const plateUrls = plateResults.map((result, index) => {
+            if (result.error) throw new Error(`Error subiendo foto placa ${index + 1}: ${result.error.message}`);
+            return supabaseClient.storage.from(bucketName).getPublicUrl(result.data.path).data.publicUrl;
+        });
+
+        // Subir Facturas (múltiples, si existen)
+        let invoiceUrls = [];
+        if (filesInvoice.length > 0) {
+            const invoiceUploadPromises = Array.from(filesInvoice).map((file, index) => {
+                const timestamp = Date.now();
+                const invoicePath = `facturas/${timestamp}_${plate}_${index + 1}.jpg`;
+                return supabaseClient.storage.from(bucketName).upload(invoicePath, file);
+            });
+
+            const invoiceResults = await Promise.all(invoiceUploadPromises);
+            invoiceUrls = invoiceResults.map((result, index) => {
+                if (result.error) throw new Error(`Error subiendo foto factura ${index + 1}: ${result.error.message}`);
+                return supabaseClient.storage.from(bucketName).getPublicUrl(result.data.path).data.publicUrl;
+            });
         }
 
         // 2. Llamar a Edge Function
@@ -1305,8 +1309,8 @@ formRegistry.addEventListener('submit', async (e) => {
             amount: amountVal, // Enviamos el valor numérico limpio
             unit: unit,        // Enviamos unidad aparte
             car_registration: plate,
-            plate_photo_url: plateUrl,
-            invoice_photo_url: invoiceUrl
+            plate_photo_url: plateUrls.join(','), // Unimos las URLs con comas
+            invoice_photo_url: invoiceUrls.join(',') // Unimos las URLs con comas
         };
 
         const { data, error: functionError } = await supabaseClient.functions.invoke(functionName, {
@@ -1497,13 +1501,25 @@ async function cargarRegistrosHoy() {
 // --- Lógica Modal de Imágenes ---
 window.abrirModalImagen = (url) => {
     if (!url) return;
-    modalImageContent.src = url;
+    
+    modalImagesContainer.innerHTML = ''; // Limpiar anteriores
+    const urls = url.split(',').map(u => u.trim()).filter(u => u);
+
+    urls.forEach(u => {
+        const img = document.createElement('img');
+        img.src = u;
+        img.style.maxWidth = '100%';
+        img.style.borderRadius = '8px';
+        img.style.boxShadow = '0 2px 5px rgba(0,0,0,0.2)';
+        modalImagesContainer.appendChild(img);
+    });
+
     modalImageViewer.classList.remove('hidden');
 };
 
 closeModalImage.addEventListener('click', () => {
     modalImageViewer.classList.add('hidden');
-    modalImageContent.src = ''; // Limpiar src para evitar que se vea la imagen anterior al abrir
+    modalImagesContainer.innerHTML = '';
 });
 
 // --- Lógica Historial ---
@@ -1805,46 +1821,87 @@ async function exportarHistorial(tipo) {
 
         // 3. Sección de Historial
         worksheet.addRow(['Detalle de Movimientos']).font = { bold: true, size: 12 };
-        const histHeader = worksheet.addRow(['Tipo', 'Fecha', 'Producto', 'Cantidad', 'Placa', 'Foto Placa', 'Foto Factura', 'Registrado por']);
+        
+        // Calcular máximo de fotos para definir columnas dinámicas
+        let maxPlatePhotos = 1;
+        let maxInvoicePhotos = 1;
+
+        historyCache.forEach(rec => {
+            const pCount = rec.plate_url ? rec.plate_url.split(',').filter(u => u.trim()).length : 0;
+            const iCount = rec.invoice_url ? rec.invoice_url.split(',').filter(u => u.trim()).length : 0;
+            if (pCount > maxPlatePhotos) maxPlatePhotos = pCount;
+            if (iCount > maxInvoicePhotos) maxInvoicePhotos = iCount;
+        });
+
+        // Construir encabezado dinámico
+        const headerRow = ['Tipo', 'Fecha', 'Producto', 'Cantidad', 'Placa'];
+        for(let i=1; i<=maxPlatePhotos; i++) headerRow.push(maxPlatePhotos > 1 ? `Foto Placa ${i}` : 'Foto Placa');
+        for(let i=1; i<=maxInvoicePhotos; i++) headerRow.push(maxInvoicePhotos > 1 ? `Foto Factura ${i}` : 'Foto Factura');
+        headerRow.push('Registrado por');
+
+        const histHeader = worksheet.addRow(headerRow);
         histHeader.eachCell(cell => cell.style = headerStyle);
 
         historyCache.forEach(rec => {
             const dateFmt = new Date(rec.created_at).toLocaleDateString('es-CO', { timeZone: 'America/Bogota' });
             const amountFmt = new Intl.NumberFormat('es-CO').format(rec.amount);
 
-            const row = worksheet.addRow([
+            const plateUrls = rec.plate_url ? rec.plate_url.split(',').map(u => u.trim()).filter(u => u) : [];
+            const invoiceUrls = rec.invoice_url ? rec.invoice_url.split(',').map(u => u.trim()).filter(u => u) : [];
+
+            const rowData = [
                 rec.type,
                 dateFmt,
                 rec.product,
                 amountFmt + ' ' + rec.unit,
-                rec.plate,
-                '', // Espacio para fórmula imagen
-                '', // Espacio para fórmula imagen
-                rec.user_name || 'N/A'
-            ]);
+                rec.plate
+            ];
 
-            // Insertar Imágenes usando fórmula nativa de Excel
-            if (rec.plate_url) {
-                row.getCell(6).value = { formula: `IF(NOW()>0, _xlfn.IMAGE("${rec.plate_url}"), "")` };
-            } else {
-                row.getCell(6).value = '-';
+            // Espacios para fotos de placa
+            for (let i = 0; i < maxPlatePhotos; i++) rowData.push('');
+            // Espacios para fotos de factura
+            for (let i = 0; i < maxInvoicePhotos; i++) rowData.push('');
+            
+            rowData.push(rec.user_name || 'N/A');
+
+            const row = worksheet.addRow(rowData);
+            row.height = 120;
+
+            // Insertar fórmulas de imagen
+            let colIndex = 6; // Columna F (1-based)
+
+            // Fotos Placa
+            for (let i = 0; i < maxPlatePhotos; i++) {
+                if (i < plateUrls.length) {
+                    row.getCell(colIndex).value = { formula: `IF(NOW()>0, _xlfn.IMAGE("${plateUrls[i]}"), "")` };
+                } else {
+                    row.getCell(colIndex).value = '-';
+                }
+                colIndex++;
             }
 
-            if (rec.invoice_url) {
-                row.getCell(7).value = { formula: `IF(NOW()>0, _xlfn.IMAGE("${rec.invoice_url}"), "")` };
-            } else {
-                row.getCell(7).value = '-';
+            // Fotos Factura
+            for (let i = 0; i < maxInvoicePhotos; i++) {
+                if (i < invoiceUrls.length) {
+                    row.getCell(colIndex).value = { formula: `IF(NOW()>0, _xlfn.IMAGE("${invoiceUrls[i]}"), "")` };
+                } else {
+                    row.getCell(colIndex).value = '-';
+                }
+                colIndex++;
             }
 
-            row.height = 120; // Altura suficiente para ver la imagen (Doble)
             row.eachCell(cell => cell.style = cellStyle);
         });
 
-        // Ajustar anchos de columna
-        worksheet.columns = [
-            { width: 15 }, { width: 15 }, { width: 25 }, { width: 15 }, 
-            { width: 15 }, { width: 40 }, { width: 40 }, { width: 25 }
+        // Ajustar anchos de columna dinámicamente
+        const colWidths = [
+            { width: 15 }, { width: 15 }, { width: 25 }, { width: 15 }, { width: 15 } // Primeras 5 columnas
         ];
+        for(let i=0; i<maxPlatePhotos; i++) colWidths.push({ width: 40 });
+        for(let i=0; i<maxInvoicePhotos; i++) colWidths.push({ width: 40 });
+        colWidths.push({ width: 25 }); // Registrado por
+
+        worksheet.columns = colWidths;
 
         // Generar y descargar
         const buffer = await workbook.xlsx.writeBuffer();
@@ -1930,8 +1987,17 @@ async function exportarHistorial(tipo) {
         const dateFmt = new Date(rec.created_at).toLocaleDateString('es-CO', { timeZone: 'America/Bogota' });
         
         // Para Word usamos etiquetas IMG normales con tamaño reducido para no romper la tabla
-        const plateCellContent = rec.plate_url ? `<img src="${rec.plate_url}" width="90" height="90">` : '-';
-        const invoiceCellContent = rec.invoice_url ? `<img src="${rec.invoice_url}" width="90" height="90">` : '-';
+        let plateCellContent = '-';
+        if (rec.plate_url) {
+            const urls = rec.plate_url.split(',').map(u => u.trim()).filter(Boolean);
+            plateCellContent = urls.map(u => `<img src="${u}" width="90" height="90" style="margin: 2px;">`).join('<br>');
+        }
+
+        let invoiceCellContent = '-';
+        if (rec.invoice_url) {
+            const urls = rec.invoice_url.split(',').map(u => u.trim()).filter(Boolean);
+            invoiceCellContent = urls.map(u => `<img src="${u}" width="90" height="90" style="margin: 2px;">`).join('<br>');
+        }
 
         tableHTML += `<tr>
             <td>${rec.type}</td>
@@ -2210,8 +2276,8 @@ formEditRegistry.addEventListener('submit', async (e) => {
     const unit = document.getElementById('edit-reg-unit-display').textContent;
     const plate = document.getElementById('edit-reg-plate').value.toUpperCase();
     
-    const filePlate = document.getElementById('edit-reg-photo-plate').files[0];
-    const fileInvoice = document.getElementById('edit-reg-photo-invoice').files[0];
+    const filesPlate = document.getElementById('edit-reg-photo-plate').files;
+    const filesInvoice = document.getElementById('edit-reg-photo-invoice').files;
 
     const updates = {
         product: product,
@@ -2224,20 +2290,32 @@ formEditRegistry.addEventListener('submit', async (e) => {
         const bucket = table === 'product_entry' ? 'entries' : 'exits';
         const timestamp = Date.now();
 
-        if (filePlate) {
-            const path = `placas/${timestamp}_EDIT_${plate}.jpg`;
-            const { error: upErr } = await supabaseClient.storage.from(bucket).upload(path, filePlate);
-            if (upErr) throw upErr;
-            updates.plate_photo_url = supabaseClient.storage.from(bucket).getPublicUrl(path).data.publicUrl;
+        if (filesPlate.length > 0) {
+            const plateUploadPromises = Array.from(filesPlate).map((file, index) => {
+                const path = `placas/${timestamp}_EDIT_${plate}_${index + 1}.jpg`;
+                return supabaseClient.storage.from(bucket).upload(path, file);
+            });
+            const plateResults = await Promise.all(plateUploadPromises);
+            const newPlateUrls = plateResults.map(res => {
+                if (res.error) throw res.error;
+                return supabaseClient.storage.from(bucket).getPublicUrl(res.data.path).data.publicUrl;
+            });
+            // Añadir nuevas URLs a las existentes, si las hay
+            updates.plate_photo_url = oldPlateUrl ? `${oldPlateUrl},${newPlateUrls.join(',')}` : newPlateUrls.join(',');
         }
 
-        if (fileInvoice) {
-            const path = `facturas/${timestamp}_EDIT_${plate}.jpg`;
-            const { error: upErr } = await supabaseClient.storage.from(bucket).upload(path, fileInvoice);
-            if (upErr) throw upErr;
-            updates.invoice_photo_url = supabaseClient.storage.from(bucket).getPublicUrl(path).data.publicUrl;
+        if (filesInvoice.length > 0) {
+            const invoiceUploadPromises = Array.from(filesInvoice).map((file, index) => {
+                const path = `facturas/${timestamp}_EDIT_${plate}_${index + 1}.jpg`;
+                return supabaseClient.storage.from(bucket).upload(path, file);
+            });
+            const invoiceResults = await Promise.all(invoiceUploadPromises);
+            const newInvoiceUrls = invoiceResults.map(res => {
+                if (res.error) throw res.error;
+                return supabaseClient.storage.from(bucket).getPublicUrl(res.data.path).data.publicUrl;
+            });
+            updates.invoice_photo_url = oldInvoiceUrl ? `${oldInvoiceUrl},${newInvoiceUrls.join(',')}` : newInvoiceUrls.join(',');
         }
-
         const { data: { session } } = await supabaseClient.auth.getSession();
 
         const { error } = await supabaseClient.functions.invoke('edit-delete-registers-imgs', {
