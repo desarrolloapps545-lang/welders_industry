@@ -523,35 +523,44 @@ th {
 @media (max-width: 768px) {
     .sidebar {
         /* Por defecto, la barra es fija y colapsada */
-        width: 80px;
+        position: fixed;
+        top: 0;
+        left: 0;
+        height: 100%;
+        z-index: 1001;
+        width: 50px;
         overflow: hidden;
         white-space: nowrap;
     }
 
     /* Estilos de colapsado por defecto en móvil */
     .sidebar .sidebar-logo {
-        max-width: 50px;
+        max-width: 35px;
+        margin: 10px auto;
         padding: 0;
         border: none;
         background-color: transparent;
     }
     .sidebar .nav-btn {
         font-size: 0;
-        padding: 15px 0;
+        padding: 10px 0;
+        display: flex;
+        justify-content: center;
     }
     .sidebar .nav-btn i {
-        font-size: 1.5rem;
+        font-size: 1.2rem;
         margin: 0;
     }
 
     /* Estado expandido en móvil (overlay) */
     .sidebar.mobile-open {
         width: 250px; /* Ancho completo al abrir */
+        box-shadow: 2px 0 5px rgba(0,0,0,0.5);
     }
 
     /* Revertir estilos para la barra expandida en móvil */
     .sidebar.mobile-open .sidebar-logo {
-        max-width: 95%;
+        max-width: 80%;
         margin: 0 auto 30px auto;
         border: 2px solid #dc3545;
         background-color: white;
@@ -560,6 +569,7 @@ th {
     .sidebar.mobile-open .nav-btn {
         font-size: 1rem;
         padding: 12px;
+        justify-content: flex-start;
     }
     .sidebar.mobile-open .nav-btn i {
         margin-right: 8px;
@@ -576,7 +586,7 @@ th {
 
     /* Dejar espacio para la barra lateral colapsada */
     .main-content {
-        padding-left: 80px;
+        margin-left: 120px;
     }
 
     /* Tablas Responsivas */
