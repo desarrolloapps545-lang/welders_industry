@@ -583,12 +583,25 @@ formNewUser.addEventListener('submit', async (e) => {
 window.eliminarUsuario = async (userId) => {
     if(!confirm("¿Estás seguro de que deseas eliminar este usuario? Esta acción no se puede deshacer.")) return;
 
+    // Obtener la sesión para enviar el token de autorización
+    const { data: { session } } = await supabaseClient.auth.getSession();
+
     const { data, error } = await supabaseClient.functions.invoke('delete-user-admin', {
-        body: { target_id: userId }
+        body: { target_id: userId },
+        headers: {
+            Authorization: `Bearer ${session?.access_token}`
+        }
     });
 
     if (error) {
-        alert("Error al eliminar: " + error.message);
+        let errorMessage = error.message;
+        if (error && error.context && typeof error.context.json === 'function') {
+            try {
+                const body = await error.context.json();
+                errorMessage = body.error || body.message || errorMessage;
+            } catch (e) { /* ignore */ }
+        }
+        alert("Error al eliminar: " + errorMessage);
     } else {
         alert("Usuario eliminado correctamente.");
         cargarUsuarios();
