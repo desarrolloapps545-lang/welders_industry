@@ -398,7 +398,6 @@ th {
 .history-controls .type-btn {
     font-weight: bold;
     cursor: pointer;
-    flex: none;
 }
 
 /* Estilos para el visualizador de stock */
@@ -519,23 +518,47 @@ th {
     opacity: 1;
 }
 
+/* Icono de menú para móviles (oculto en escritorio) */
+.mobile-menu-icon {
+    display: none;
+    width: 30px;
+    height: 30px;
+    margin-right: 15px;
+    cursor: pointer;
+    vertical-align: middle;
+    transition: transform 0.2s;
+}
+
+.mobile-menu-icon:hover {
+    transform: scale(1.1);
+}
+
 /* Media Queries para Pantallas Pequeñas */
 @media (max-width: 768px) {
+    .mobile-menu-icon {
+        display: inline-block;
+    }
+
     .sidebar {
-        /* Por defecto, la barra es fija y colapsada */
         position: fixed;
         top: 0;
         left: 0;
         height: 100%;
-        z-index: 1001;
-        width: 50px;
+        z-index: 1000;
+        width: 80px;
+        transform: translateX(-100%); /* Oculta por defecto */
+        transition: transform 0.3s ease-in-out;
         overflow: hidden;
         white-space: nowrap;
     }
 
-    /* Estilos de colapsado por defecto en móvil */
+    .sidebar.mobile-visible {
+        transform: translateX(0); /* Muestra la barra */
+    }
+
+    /* Estilos para la barra en móvil (siempre colapsada) */
     .sidebar .sidebar-logo {
-        max-width: 35px;
+        max-width: 50px;
         margin: 10px auto;
         padding: 0;
         border: none;
@@ -543,37 +566,13 @@ th {
     }
     .sidebar .nav-btn {
         font-size: 0;
-        padding: 10px 0;
+        padding: 15px 0;
         display: flex;
         justify-content: center;
     }
     .sidebar .nav-btn i {
-        font-size: 1.2rem;
+        font-size: 1.5rem;
         margin: 0;
-    }
-
-    /* Estado expandido en móvil (overlay) */
-    .sidebar.mobile-open {
-        width: 250px; /* Ancho completo al abrir */
-        box-shadow: 2px 0 5px rgba(0,0,0,0.5);
-    }
-
-    /* Revertir estilos para la barra expandida en móvil */
-    .sidebar.mobile-open .sidebar-logo {
-        max-width: 80%;
-        margin: 0 auto 30px auto;
-        border: 2px solid #dc3545;
-        background-color: white;
-        padding: 5px;
-    }
-    .sidebar.mobile-open .nav-btn {
-        font-size: 1rem;
-        padding: 12px;
-        justify-content: flex-start;
-    }
-    .sidebar.mobile-open .nav-btn i {
-        margin-right: 8px;
-        font-size: 1rem;
     }
 
     /* Ajuste de encabezados de workspace */
@@ -582,13 +581,15 @@ th {
         align-items: center;
         font-size: 1.5rem;
         padding: 10px;
+        position: sticky;
+        top: 0;
+        z-index: 100;
     }
 
     /* Dejar espacio para la barra lateral colapsada */
     .main-content {
-        margin-left: 120px;
+        margin-left: 0;
     }
-
     /* Tablas Responsivas */
     th, td {
         font-size: 0.8rem;
@@ -616,13 +617,20 @@ th {
 
     /* Controles de Historial en columna */
     .history-controls {
-        flex-direction: column;
-        align-items: stretch;
+        flex-wrap: wrap;
+        justify-content: space-between;
+        gap: 10px;
     }
     
     .history-controls > * {
-        width: 100%;
-        margin-bottom: 5px;
+        flex-grow: 1;
+        flex-basis: calc(50% - 5px); /* Para 2 columnas con gap de 10px */
+        margin-bottom: 0;
+        width: 0; /* Fuerza a que el flex-basis sea la propiedad dominante para el ancho */
+    }
+
+    #history-stock-display {
+        flex-basis: 100%;
     }
     
     /* Modales ancho completo */
@@ -634,7 +642,7 @@ th {
 
     /* Ajustar container de login y bienvenida */
     .container {
-        width: 90%;
+        width: 85%;
         padding: 1.5rem;
     }
 
@@ -650,8 +658,8 @@ th {
 
     /* Botones de bienvenida más compactos */
     #welcome-buttons-container .nav-btn, #btn-logout-welcome {
-        padding: 10px;
-        font-size: 0.9rem;
+        padding: 8px;
+        font-size: 0.8rem;
     }
 
     #welcome-buttons-container {

@@ -123,6 +123,8 @@ const editRegProductSelect = document.getElementById('edit-reg-product');
 const sidebar = document.querySelector('.sidebar');
 const sidebarLogo = document.querySelector('.sidebar-logo');
 const sidebarOverlay = document.getElementById('sidebar-overlay');
+const mobileMenuIcons = document.querySelectorAll('.mobile-menu-icon');
+const mainContent = document.querySelector('.main-content');
 
 // Evento para colapsar/expandir sidebar
 if (sidebarLogo) {
@@ -136,31 +138,28 @@ if (sidebarLogo) {
                 sidebarLogo.src = 'img/logos/login.png';
             }
         } else {
-            // Comportamiento móvil: abrir como overlay
-            if (sidebar.classList.contains('mobile-open')) {
-                cerrarSidebarMovil();
-            } else {
-                abrirSidebarMovil();
-            }
+            // Comportamiento móvil: el logo dentro de la barra la oculta
+            toggleSidebarMovil();
         }
     });
 }
 
 // --- Lógica Menú Móvil ---
-function abrirSidebarMovil() {
-    sidebar.classList.add('mobile-open');
-    sidebarOverlay.classList.add('active');
-    sidebarLogo.src = 'img/logos/login.png'; // Mostrar logo grande al expandir
+function toggleSidebarMovil() {
+    sidebar.classList.toggle('mobile-visible');
+    sidebarOverlay.classList.toggle('active');
 }
 
-function cerrarSidebarMovil() {
-    sidebar.classList.remove('mobile-open');
-    sidebarOverlay.classList.remove('active');
-    sidebarLogo.src = 'img/logos/hover.png'; // Mostrar logo pequeño al colapsar
-}
-
+// Eventos para iconos de menú en encabezados
+mobileMenuIcons.forEach(icon => {
+    icon.addEventListener('click', toggleSidebarMovil);
+});
 // Cerrar al dar click en el overlay
-sidebarOverlay.addEventListener('click', cerrarSidebarMovil);
+if (sidebarOverlay) {
+    sidebarOverlay.addEventListener('click', toggleSidebarMovil);
+}
+
+
 
 // --- Variables Globales ---
 let currentUserRole = null;
@@ -207,7 +206,9 @@ function abrirWorkspace(idWorkspace) {
         ws.classList.remove('hidden');
         
         // Cerrar sidebar automáticamente en móvil al seleccionar opción
-        if (window.innerWidth <= 768) cerrarSidebarMovil();
+        if (window.innerWidth <= 768 && sidebar.classList.contains('mobile-visible')) {
+            toggleSidebarMovil();
+        }
 
         if (idWorkspace === 'workspace-users') {
             cargarUsuarios(); // Cargar datos al abrir la pestaña
