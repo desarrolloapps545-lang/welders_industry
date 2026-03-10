@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login Supabase</title>
+    <link rel="stylesheet" href="styles.css">
+    <!-- Importar Supabase desde CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <!-- Importar SheetJS (xlsx) para exportar a Excel -->
+    <script src="https://cdn.jsdelivr.net/npm/xlsx/dist/xlsx.full.min.js"></script>
+</head>
+<body>
+    <div id="login-container">
+        <h2>Iniciar Sesión</h2>
+        <input type="email" id="email" placeholder="Correo electrónico">
+        <input type="password" id="password" placeholder="Contraseña">
+        <button id="login-btn">Ingresar</button>
+        <p id="error-message"></p>
+    </div>
+
+    <!-- Contenedor del Dashboard (Oculto por defecto) -->
+    <div id="dashboard-container" class="hidden">
+        <nav id="top-navbar">
+            <div class="logo">Welders Industry</div>
+            <!-- Menú exclusivo para admins/desarrolladores -->
+            <div id="admin-menu" class="hidden">
+                <button class="nav-btn" data-section="usuarios">Usuarios</button>
+                <button class="nav-btn" data-section="historial">Historial</button>
+                <button class="nav-btn" data-section="asistencia">Asistencia</button>
+
+            </div>
+            <button id="logout-btn">Cerrar Sesión</button>
+        </nav>
+        <div id="main-content">
+            <div id="welcome-view" class="view-container">
+                <h2>Bienvenido a Welders Industry</h2>
+                <p>Selecciona una opción del menú superior para comenzar a trabajar.</p>
+            </div>
+
+            <div id="usuarios-view" class="view-container hidden">
+                <!-- El contenido de usuarios se cargará aquí -->
+            </div>
+
+            <div id="historial-view" class="view-container hidden">
+                <div class="view-header">
+                    <h2>Historial de Asistencia</h2>
+                </div>
+                <div id="history-filter-bar">
+                    <div class="filter-item">
+                        <label for="operator-filter">Operario:</label>
+                        <select id="operator-filter">
+                            <option value="all">Todos</option>
+                        </select>
+                    </div>                  
+                    <div class="filter-item">
+                        <label>Fecha:</label>
+                        <button id="date-filter-btn" class="filter-btn">Cualquier fecha</button>
+                    </div>
+                    <div class="filter-item">
+                        <span>Días trabajados:</span>
+                        <strong id="worked-days-counter">--</strong>
+                    </div>
+                    <div class="filter-item-group">
+                        <div class="filter-item">
+                            <button id="filter-type-entrada" class="filter-btn">Entradas</button>
+                        </div>
+                        <div class="filter-item">
+                            <button id="filter-type-salida" class="filter-btn">Salidas</button>
+                        </div>
+                    </div>
+                    <div>
+                        <button id="export-report-btn" class="action-btn">Informe</button>
+                        <button id="clear-filters-btn" class="action-btn">Borrar Filtros</button>
+                    </div>
+                </div>
+                <table class="data-table">
+                    <thead>
+                        <tr><th>Nombre</th><th>Tipo</th><th>Fecha</th><th>Hora</th><th>Día</th><th>Ubicación</th></tr>
+                    </thead>
+                    <tbody id="history-table-body"></tbody>
+                </table>
+            </div>
+
+            <div id="asistencia-view" class="view-container hidden">
+                <!-- El contenido de asistencia se cargará aquí -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal para Crear Usuario (Oculto por defecto) -->
+    <div id="modal-overlay" class="modal-overlay hidden"></div>
+    <div id="create-user-modal" class="modal hidden">
+        <button id="close-modal-btn" class="close-btn">&times;</button>
+        <h3>Crear Nuevo Usuario</h3>
+        <input type="text" id="new-user-name" placeholder="Nombre completo">
+        <input type="email" id="new-user-email" placeholder="Correo electrónico">
+        <input type="password" id="new-user-password" placeholder="Contraseña">
+        <select id="new-user-role">
+            <!-- Opciones de rol se llenarán dinámicamente -->
+        </select>
+        <button id="create-user-btn" class="action-btn">Crear Usuario</button>
+    </div>
+
+    <!-- Modal para Actualizar Usuario -->
+    <div id="update-user-modal" class="modal hidden">
+        <button id="close-update-modal-btn" class="close-btn">&times;</button>
+        <h3>Actualizar Datos</h3>
+        <input type="hidden" id="update-user-id">
+        <input type="text" id="update-user-name" placeholder="Nombre completo">
+        <input type="email" id="update-user-email" placeholder="Correo electrónico">
+        <select id="update-user-role">
+            <!-- Opciones de rol se llenarán dinámicamente -->
+        </select>
+        <button id="save-update-btn" class="action-btn edit-btn">Guardar Cambios</button>
+    </div>
+
+    <!-- Modal para Cambiar Contraseña -->
+    <div id="change-password-modal" class="modal hidden">
+        <button id="close-password-modal-btn" class="close-btn">&times;</button>
+        <h3>Cambiar Contraseña</h3>
+        <input type="hidden" id="password-user-id">
+        <input type="password" id="new-password-input" placeholder="Nueva contraseña">
+        <button id="save-password-btn" class="action-btn password-btn">Actualizar Contraseña</button>
+    </div>
+
+    <!-- Modal para Eliminar Usuario -->
+    <div id="delete-user-modal" class="modal hidden">
+        <button id="close-delete-modal-btn" class="close-btn">&times;</button>
+        <h3>Eliminar Usuario</h3>
+        <p>¿Estás seguro de que deseas eliminar este usuario? Esta acción no se puede deshacer.</p>
+        <input type="hidden" id="delete-user-id">
+        <button id="confirm-delete-btn" class="action-btn delete-btn">Eliminar Definitivamente</button>
+    </div>
+
+    <!-- Modal para Mensajes Genéricos -->
+    <div id="message-modal" class="modal hidden">
+        <h3 id="message-modal-title">Aviso</h3>
+        <p id="message-modal-text"></p>
+        <button id="message-modal-ok-btn" class="action-btn">Aceptar</button>
+    </div>
+
+    <!-- Modal para ver el Mapa -->
+    <div id="map-modal" class="modal hidden">
+        <button id="close-map-modal-btn" class="close-btn">&times;</button>
+        <h3 id="map-modal-title">Ubicación del Registro</h3>
+        <div id="map-container" style="height: 45vh; width: 100%;">
+            <!-- Iframe se insertará aquí -->
+        </div>
+    </div>
+
+    <!-- Modal para Selección de Fecha -->
+    <div id="date-select-modal" class="modal hidden">
+        <button id="close-date-modal-btn" class="close-btn">&times;</button>
+        <h3>Seleccionar Fecha</h3>
+        <div class="date-select-tabs">
+            <button class="tab-btn active" data-tab="specific">Fecha Específica</button>
+            <button class="tab-btn" data-tab="range">Rango</button>
+            <button class="tab-btn" data-tab="month">Mes</button>
+        </div>
+        <div id="specific-date-tab" class="tab-content">
+            <input type="date" id="specific-date-input">
+        </div>
+        <div id="range-date-tab" class="tab-content hidden">
+            <label>Desde:</label>
+            <input type="date" id="range-start-date-input">
+            <label>Hasta:</label>
+            <input type="date" id="range-end-date-input">
+        </div>
+        <div id="month-date-tab" class="tab-content hidden">
+            <input type="month" id="month-date-input">
+        </div>
+        <button id="apply-date-filter-btn" class="action-btn">Aplicar</button>
+    </div>
+
+    <script src="functions.js"></script>
+</body>
+</html>

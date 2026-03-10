@@ -1,0 +1,389 @@
+body {
+    font-family: Arial, sans-serif;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    margin: 0;
+    background-color: #f4f4f4;
+    flex-direction: column; /* Para que el navbar quede arriba */
+}
+
+#login-container {
+    background: white;
+    padding: 2rem;
+    border-radius: 8px;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    text-align: center;
+    width: 300px;
+}
+
+input {
+    width: 90%;
+    padding: 10px;
+    margin: 10px 0;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+}
+
+button {
+    width: 100%;
+    padding: 10px;
+    background-color: #2ecc71;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    min-height: 30px;
+    font-size: 16px;
+}
+
+button:hover {
+    background-color: #27ae60;
+}
+
+#error-message {
+    color: #e74c3c;
+    margin-top: 10px;
+    font-size: 14px;
+}
+
+/* --- Estilos del Dashboard --- */
+.hidden {
+    display: none !important;
+}
+
+#dashboard-container {
+    width: 100%;
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+#top-navbar {
+    background-color: #34495e;
+    color: white;
+    padding: 1rem 2rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.logo {
+    font-weight: bold;
+    font-size: 1.2rem;
+}
+
+.nav-btn {
+    background: transparent;
+    border: 1px solid white;
+    margin: 0 5px;
+    width: auto;
+    padding: 5px 15px;
+}
+
+.nav-btn:hover {
+    background: rgba(255,255,255,0.1);
+}
+
+#top-navbar.operator-view {
+    justify-content: center; /* Centra el contenido */
+    position: relative; /* Para posicionar el botón de logout */
+}
+
+#top-navbar.operator-view .logo {
+    /* El logo se centrará por el justify-content del padre */
+}
+
+#top-navbar.operator-view #logout-btn {
+    position: absolute; /* Saca el botón del flujo normal */
+    right: 2rem; /* Lo posiciona a la derecha */
+}
+
+#logout-btn {
+    width: auto;
+    background-color: #e74c3c;
+}
+
+#main-content {
+    padding: 2rem;
+    flex-grow: 1;
+    overflow-y: auto; /* Para permitir scroll si la tabla es grande */
+}
+
+/* --- Estilos para la tabla de datos --- */
+.data-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 1rem;
+    background-color: white;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.data-table th, .data-table td {
+    border: 1px solid #ddd;
+    padding: 12px;
+    text-align: left;
+}
+
+.data-table th {
+    background-color: #f2f2f2;
+    font-weight: bold;
+}
+
+.data-table tbody tr:nth-child(even) {
+    background-color: #f9f9f9;
+}
+
+/* --- Estilos para el Modal --- */
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.6);
+    z-index: 100;
+}
+
+.modal {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: white;
+    padding: 2rem;
+    border-radius: 8px;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+    z-index: 101;
+    width: 90%;
+    max-width: 400px;
+}
+
+.modal h3 {
+    margin-top: 0;
+    margin-bottom: 1.5rem;
+}
+
+.modal input, .modal select {
+    width: 100%;
+    box-sizing: border-box; /* Asegura que el padding no afecte el ancho total */
+}
+
+.close-btn {
+    position: absolute;
+    top: 10px;
+    right: 15px;
+    background: transparent;
+    border: none;
+    font-size: 2rem;
+    color: #aaa;
+    cursor: pointer;
+    padding: 0;
+    width: auto;
+}
+
+.close-btn:hover { color: #333; }
+
+.action-btn { background-color: #3498db; width: auto; padding: 10px 20px; margin-top: 1rem; }
+.action-btn:hover { background-color: #2980b9; }
+
+.view-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; }
+.view-header h2 { margin: 0; }
+
+/* --- Botones de Acciones en Tabla --- */
+.table-btn {
+    padding: 5px 10px;
+    margin-right: 5px;
+    font-size: 0.8rem;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    color: white;
+    width: auto; /* Sobrescribe el width: 100% global de button */
+}
+
+.edit-btn { background-color: #f39c12; }
+.edit-btn:hover { background-color: #e67e22; }
+
+.password-btn { background-color: #34495e; }
+.password-btn:hover { background-color: #2c3e50; }
+
+.delete-btn { background-color: #e74c3c; }
+.delete-btn:hover { background-color: #c0392b; }
+
+/* --- Estilos para la sección de Asistencia --- */
+.attendance-selection-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1rem;
+    margin-top: 1.5rem;
+}
+
+.attendance-selection-container .action-btn {
+    width: 250px;
+}
+
+#attendance-form-container {
+    background: white;
+    padding: 2rem;
+    border-radius: 8px;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    max-width: 400px;
+    margin: 2rem auto 0 auto; /* Centrado horizontal con margen superior */
+    text-align: center;
+}
+
+#attendance-form-container p {
+    text-align: left; /* Alinea los párrafos a la izquierda dentro de la tarjeta */
+}
+
+#attendance-form-container .action-btn {
+    width: 100%; /* El botón ocupará todo el ancho de la tarjeta */
+}
+
+/* --- Estilos para el Historial --- */
+.record-type-entrada {
+    color: #27ae60;
+    font-weight: bold;
+}
+.record-type-salida {
+    color: #c0392b;
+    font-weight: bold;
+}
+
+/* --- Estilos para el Formulario de Asistencia de Admin --- */
+#admin-attendance-form {
+    background: white;
+    padding: 2rem;
+    border-radius: 8px;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    max-width: 800px;
+    margin: 1rem auto;
+}
+
+.form-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1.5rem;
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+}
+
+.form-group label {
+    margin-bottom: 0.5rem;
+    font-weight: bold;
+    font-size: 0.9rem;
+}
+
+.form-actions {
+    margin-top: 2rem;
+    display: flex;
+    justify-content: flex-end;
+    gap: 1rem;
+}
+
+/* --- Estilos para la Barra de Filtros del Historial --- */
+#history-filter-bar {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+    background-color: #f9f9f9;
+    padding: 1rem;
+    border-radius: 8px;
+    margin-bottom: 1rem;
+    border: 1px solid #ddd; /* Mantiene el borde */
+    align-items: center; /* Alineación vertical */
+    /*justify-content: center;*/ /* Centrado estricto */
+}
+
+.filter-item, .filter-item-group {
+    display: flex;
+    gap: 1.5rem;
+    align-items: center;
+    margin-bottom: 0;
+    text-align: center; /* Centrar texto dentro de cada item */
+}
+
+.filter-item-group {
+    /* Los grupos se manejan con 'gap' en el contenedor principal */
+}
+
+.filter-item label, .filter-item span {
+    display: flex;
+    align-items: center;
+    font-weight: bold;
+    font-size: 0.9rem;
+    padding: 0.3rem 0;
+    margin-right: 0.5rem; /* Espacio entre label y el control */
+}
+
+.filter-btn {
+    background-color: #ecf0f1;
+    border: 1px solid #bdc3c7;
+    min-width: 100px;
+    color: #34495e;
+}
+.filter-btn:hover {
+    background-color: #dce4e6;
+}
+
+
+/* --- Estilos para el Modal de Selección de Fecha --- */
+.date-select-tabs {
+    display: flex;
+    margin-bottom: 1rem;
+    border-bottom: 1px solid #ddd;
+}
+
+.tab-btn {
+    flex: initial; /* Evita que los botones se estiren para llenar el espacio */
+    width: auto; /* Anula el width:100% del estilo de botón genérico */
+    padding: 8px 16px; /* Ajusta el relleno para un tamaño más adecuado */
+    font-size: 14px; /* Reduce el tamaño de la fuente */
+    border-radius: 4px 4px 0 0;
+    border-bottom: none;
+    background-color: #ecf0f1; /* Color neutro para pestañas inactivas */
+    color: #34495e;
+    border: 1px solid #bdc3c7; /* Añade un borde para mayor definición */
+}
+
+.tab-btn.active {
+    background-color: #3498db;
+    color: white;
+    border-color: #3498db;
+}
+.tab-content {
+    padding: 1rem 0;
+}
+
+/* --- Modificaciones al selector de filtros --- */
+#history-filter-bar {
+    /*justify-content: space-around; Eliminar esta linea*/
+    display: flex;
+    gap: 1rem;
+    align-items: baseline;
+}
+
+.filter-item {
+     margin-bottom: 0; /* Elimina el margen inferior */
+}
+
+.action-btn {
+    background-color: #3498db;
+    width: auto;
+    padding: 10px 20px;
+    margin-top: 1rem;
+}
+
+.action-btn:hover {
+    background-color: #2980b9;
+}
+
+.filter-item > label {
+    margin-right: 0.3rem;
+}
